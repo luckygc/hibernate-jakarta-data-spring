@@ -19,6 +19,7 @@
         <jspecify.version>1.0.0</jspecify.version>
         <hibernate.version>7.0.0.Beta4</hibernate.version>
         <hibernate-validator.version>9.0.0.CR1</hibernate-validator.version>
+        <spring.version>6.2.3</spring.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
 
@@ -59,6 +60,19 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
