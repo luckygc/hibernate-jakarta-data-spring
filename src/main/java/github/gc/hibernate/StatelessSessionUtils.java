@@ -1,11 +1,15 @@
 package github.gc.hibernate;
 
+import github.gc.hibernate.proxy.StatelessSessionProxy;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,29 +21,32 @@ public final class StatelessSessionUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(StatelessSessionUtils.class);
 
-	public static StatelessSession doGetTransactionalStatelessSession(SessionFactory sessionFactory,
-			DataSource dataSource) {
-		StatelessSessionHolder ssHolder = (StatelessSessionHolder) TransactionSynchronizationManager.getResource(
-				sessionFactory);
+	@Nullable
+	public static StatelessSession doGetTransactionalStatelessSession(@NonNull SessionFactory sessionFactory,
+			@NonNull DataSource dataSource) {
+		Assert.notNull(sessionFactory, "No SessionFactory specified");
+		Assert.notNull(dataSource, "No DataSource specified");
 
-		if (ssHolder != null) {
-			ssHolder.requested();
-			return ssHolder.getStatelessSession();
+		var sessionHolder = (StatelessSessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+
+		if (sessionHolder != null) {
+			sessionHolder.requested();
+			return sessionHolder.getStatelessSession();
 		} else if (!TransactionSynchronizationManager.isSynchronizationActive()) {
 			return null;
 		}
 
-		log.debug("Opening Hibernate StatelessSession");
+		log.debug("Opening Transactional Hibernate StatelessSession");
 		Connection connection = DataSourceUtils.getConnection(dataSource);
 		StatelessSession ss = sessionFactory.openStatelessSession(connection);
 
 		try {
-			ssHolder = new StatelessSessionHolder(ss);
-			TransactionSynchronizationManager.registerSynchronization(
-					new StatelessSessionSynchronization(ssHolder, sessionFactory));
-			ssHolder.setSynchronizedWithTransaction(true);
+			sessionHolder = new StatelessSessionHolder(ss);
+			var sessionSynchronization = new StatelessSessionSynchronization(sessionHolder, sessionFactory);
+			TransactionSynchronizationManager.registerSynchronization(sessionSynchronization);
+			sessionHolder.setSynchronizedWithTransaction(true);
 
-			TransactionSynchronizationManager.bindResource(sessionFactory, ssHolder);
+			TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
 		} catch (Throwable ex) {
 			closeStatelessSession(ss);
 			throw ex;

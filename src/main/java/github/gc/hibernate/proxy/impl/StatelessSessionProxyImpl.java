@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import org.hibernate.*;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.jdbc.ReturningWork;
@@ -20,13 +21,15 @@ import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaInsert;
 import org.hibernate.query.criteria.JpaCriteriaInsertSelect;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -34,88 +37,69 @@ import java.util.function.Function;
  * 线程安全，事务内使用线程绑定的session，常规操作操作完直接关闭。
  * StatelessSession默认连接管理策略是需要时获取连接，事务后释放，通过事务后
  */
+@SuppressWarnings({"deprecation", "unchecked"})
 public class StatelessSessionProxyImpl implements StatelessSession, StatelessSessionProxy {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private final SessionFactory sessionFactory;
 	private final DataSource dataSource;
 
-	public StatelessSessionProxyImpl(SessionFactory sessionFactory, DataSource dataSource) {
+	public StatelessSessionProxyImpl(@NonNull SessionFactory sessionFactory) {
+		Assert.notNull(sessionFactory, "SessionFactory must not be null");
 		this.sessionFactory = sessionFactory;
-		this.dataSource = dataSource;
+		Object datasourceObj = this.sessionFactory.getProperties().get(AvailableSettings.JAKARTA_NON_JTA_DATASOURCE);
+		if (datasourceObj instanceof DataSource ds) {
+			this.dataSource = ds;
+		} else {
+			throw new IllegalArgumentException("SessionFactory must have a DataSource");
+		}
 	}
 
-	private <T> T doInvoke(Function<StatelessSession, T> function) {
-		StatelessSession statelessSession = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory,
-				dataSource);
-		boolean isNewSession = false;
-		if (statelessSession == null) {
-			statelessSession = sessionFactory.openStatelessSession();
-			isNewSession = true;
+	private <R> R execute(Function<StatelessSession, R> function) {
+		StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
+		boolean needImmediatelyClose = false;
+		if (session == null) {
+			session = sessionFactory.openStatelessSession();
+			needImmediatelyClose = true;
 		}
 
 		try {
-			return function.apply(statelessSession);
-		} finally {
-			if (isNewSession) {
-				StatelessSessionUtils.closeStatelessSession(statelessSession);
+			R result = function.apply(session);
+			if (result instanceof Query<?> query) {
+				needImmediatelyClose = false;
+				return ((R) new QueryProxy<>(query, session));
 			}
-		}
-	}
 
-	private void doInvoke(Consumer<StatelessSession> consumer) {
-		StatelessSession statelessSession = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory,
-				dataSource);
-		boolean isNewSession = false;
-		if (statelessSession == null) {
-			statelessSession = sessionFactory.openStatelessSession();
-			isNewSession = true;
-		}
-
-		try {
-			consumer.accept(statelessSession);
+			return result;
 		} finally {
-			if (isNewSession) {
-				StatelessSessionUtils.closeStatelessSession(statelessSession);
-			}
-		}
-	}
-
-	private <T> void doInvoke(BiConsumer<StatelessSession, T> biConsumer, T t) {
-		StatelessSession statelessSession = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory,
-				dataSource);
-		boolean isNewSession = false;
-		if (statelessSession == null) {
-			statelessSession = sessionFactory.openStatelessSession();
-			isNewSession = true;
-		}
-
-		try {
-			biConsumer.accept(statelessSession, t);
-		} finally {
-			if (isNewSession) {
-				StatelessSessionUtils.closeStatelessSession(statelessSession);
+			if (needImmediatelyClose) {
+				StatelessSessionUtils.closeStatelessSession(session);
 			}
 		}
 	}
 
 	@Override
 	public String getTenantIdentifier() {
-		return doInvoke(StatelessSession::getTenantIdentifier);
+		return execute(StatelessSession::getTenantIdentifier);
 	}
 
 	@Override
 	public Object getTenantIdentifierValue() {
-		return doInvoke(StatelessSession::getTenantIdentifierValue);
+		return execute(StatelessSession::getTenantIdentifierValue);
 	}
 
 	@Override
 	public CacheMode getCacheMode() {
-		return doInvoke(StatelessSession::getCacheMode);
+		return execute(StatelessSession::getCacheMode);
 	}
 
 	@Override
 	public void setCacheMode(CacheMode cacheMode) {
-		doInvoke(StatelessSession::setCacheMode, cacheMode);
+		execute(session -> {
+			session.setCacheMode(cacheMode);
+			return null;
+		});
 	}
 
 	@Override
@@ -135,17 +119,17 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 
 	@Override
 	public Transaction beginTransaction() {
-		return null;
+		throw new UnsupportedOperationException("不允许在StatelessSessionProxy上调用beginTransaction - 使用Spring事务");
 	}
 
 	@Override
 	public Transaction getTransaction() {
-		throw new IllegalStateException("不允许在StatelessSessionProxy上调用getTransaction - 使用Spring事务代替");
+		throw new UnsupportedOperationException("不允许在StatelessSessionProxy上调用getTransaction - 使用Spring事务");
 	}
 
 	@Override
 	public void joinTransaction() {
-		throw new IllegalStateException("不允许在StatelessSessionProxy上调用joinTransaction - 自动加入Spring事务");
+		log.debug("自动加入Spring事务，不需要手动调用joinTransaction");
 	}
 
 	@Override
@@ -155,60 +139,55 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 
 	@Override
 	public ProcedureCall getNamedProcedureCall(String name) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureCall(String procedureName) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureCall(String procedureName, Class<?>... resultClasses) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureCall(String procedureName, String... resultSetMappings) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createNamedStoredProcedureQuery(String name) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureQuery(String procedureName) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureQuery(String procedureName, Class<?>... resultClasses) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public ProcedureCall createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
-		// TODO
-		return null;
+		throw new UnsupportedOperationException("不支持存储过程调用");
 	}
 
 	@Override
 	public Integer getJdbcBatchSize() {
-		return doInvoke(StatelessSession::getJdbcBatchSize);
+		return execute(StatelessSession::getJdbcBatchSize);
 	}
 
 	@Override
 	public void setJdbcBatchSize(Integer jdbcBatchSize) {
-		doInvoke(StatelessSession::setJdbcBatchSize, jdbcBatchSize);
+		execute(session -> {
+			session.setJdbcBatchSize(jdbcBatchSize);
+			return null;
+		});
 	}
 
 	@Override
@@ -218,216 +197,267 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 
 	@Override
 	public void doWork(Work work) throws HibernateException {
-
+		execute(session -> {
+			session.doWork(work);
+			return null;
+		});
 	}
 
 	@Override
 	public <T> T doReturningWork(ReturningWork<T> work) {
-		return null;
+		return execute(session -> session.doReturningWork(work));
 	}
 
 	@Override
 	public <T> RootGraph<T> createEntityGraph(Class<T> rootType) {
-		return null;
+		return execute(session -> session.createEntityGraph(rootType));
 	}
 
 	@Override
 	public RootGraph<?> createEntityGraph(String graphName) {
-		return null;
+		return execute(session -> session.createEntityGraph(graphName));
 	}
 
 	@Override
 	public <T> RootGraph<T> createEntityGraph(Class<T> rootType, String graphName) {
-		return null;
+		return execute(session -> session.createEntityGraph(rootType, graphName));
 	}
 
 	@Override
 	public RootGraph<?> getEntityGraph(String graphName) {
-		return null;
+		return execute(session -> session.getEntityGraph(graphName));
 	}
 
 	@Override
 	public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
-		return List.of();
+		return execute(session -> session.getEntityGraphs(entityClass));
 	}
 
 	@Override
 	public Filter enableFilter(String filterName) {
-		return null;
+		return execute(session -> session.enableFilter(filterName));
 	}
 
 	@Override
 	public Filter getEnabledFilter(String filterName) {
-		return null;
+		return execute(session -> session.getEnabledFilter(filterName));
 	}
 
 	@Override
 	public void disableFilter(String filterName) {
-
+		execute(session -> {
+			session.disableFilter(filterName);
+			return null;
+		});
 	}
 
 	@Override
 	public SessionFactory getFactory() {
-		return null;
+		return this.sessionFactory;
 	}
 
 	@Override
 	public Object insert(Object entity) {
-		return null;
+		return execute(session -> session.insert(entity));
 	}
 
 	@Override
 	public void insertMultiple(List<?> entities) {
-
+		execute(session -> {
+			session.insertMultiple(entities);
+			return null;
+		});
 	}
 
 	@Override
 	public Object insert(String entityName, Object entity) {
-		return null;
+		return execute(session -> session.insert(entityName, entity));
 	}
 
 	@Override
 	public void update(Object entity) {
-
+		execute(session -> {
+			session.update(entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void updateMultiple(List<?> entities) {
-
+		execute(session -> {
+			session.updateMultiple(entities);
+			return null;
+		});
 	}
 
 	@Override
 	public void update(String entityName, Object entity) {
-
+		execute(session -> {
+			session.update(entityName, entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void delete(Object entity) {
-
+		execute(session -> {
+			session.delete(entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void deleteMultiple(List<?> entities) {
-
+		execute(session -> {
+			session.deleteMultiple(entities);
+			return null;
+		});
 	}
 
 	@Override
 	public void delete(String entityName, Object entity) {
-
+		execute(session -> {
+			session.delete(entityName, entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void upsert(Object entity) {
-
+		execute(session -> {
+			session.upsert(entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void upsertMultiple(List<?> entities) {
-
+		execute(session -> {
+			session.upsertMultiple(entities);
+			return null;
+		});
 	}
 
 	@Override
 	public void upsert(String entityName, Object entity) {
-
+		execute(session -> {
+			session.upsert(entityName, entity);
+			return null;
+		});
 	}
 
 	@Override
 	public Object get(String entityName, Object id) {
-		return null;
+		return execute(session -> session.get(entityName, id));
 	}
 
 	@Override
 	public <T> T get(Class<T> entityClass, Object id) {
-		return null;
+		return execute(session -> session.get(entityClass, id));
 	}
 
 	@Override
 	public Object get(String entityName, Object id, LockMode lockMode) {
-		return null;
+		return execute(session -> session.get(entityName, id, lockMode));
 	}
 
 	@Override
 	public <T> T get(Class<T> entityClass, Object id, LockMode lockMode) {
-		return null;
+		return execute(session -> session.get(entityClass, id, lockMode));
 	}
 
 	@Override
 	public <T> T get(EntityGraph<T> graph, GraphSemantic graphSemantic, Object id) {
-		return null;
+		return execute(session -> session.get(graph, graphSemantic, id));
 	}
 
 	@Override
 	public <T> T get(EntityGraph<T> graph, GraphSemantic graphSemantic, Object id, LockMode lockMode) {
-		return null;
+		return execute(session -> session.get(graph, graphSemantic, id, lockMode));
 	}
 
 	@Override
 	public <T> List<T> getMultiple(Class<T> entityClass, List<Object> ids) {
-		return List.of();
+		return execute(session -> session.getMultiple(entityClass, ids));
 	}
 
 	@Override
 	public void refresh(Object entity) {
-
+		execute(session -> {
+			session.refresh(entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void refresh(String entityName, Object entity) {
-
+		execute(session -> {
+			session.refresh(entityName, entity);
+			return null;
+		});
 	}
 
 	@Override
 	public void refresh(Object entity, LockMode lockMode) {
-
+		execute(session -> {
+			session.refresh(entity, lockMode);
+			return null;
+		});
 	}
 
 	@Override
 	public void refresh(String entityName, Object entity, LockMode lockMode) {
-
+		execute(session -> {
+			session.refresh(entityName, entity, lockMode);
+			return null;
+		});
 	}
 
 	@Override
 	public void fetch(Object association) {
-
+		execute(session -> {
+			session.fetch(association);
+			return null;
+		});
 	}
 
 	@Override
 	public Object getIdentifier(Object entity) {
-		return null;
+		return execute(session -> session.getIdentifier(entity));
 	}
 
 	@Override
-	public Query createQuery(String queryString) {
-		return null;
+	public Query<?> createQuery(String queryString) {
+		return execute(session -> session.createQuery(queryString));
 	}
 
 	@Override
 	public <R> Query<R> createQuery(String queryString, Class<R> resultClass) {
-		return null;
+		return execute(session -> session.createQuery(queryString, resultClass));
 	}
 
 	@Override
 	public <R> Query<R> createQuery(TypedQueryReference<R> typedQueryReference) {
-		return null;
+		return execute(session -> session.createQuery(typedQueryReference));
 	}
 
 	@Override
 	public <R> Query<R> createQuery(CriteriaQuery<R> criteriaQuery) {
-		return null;
+		return execute(session -> session.createQuery(criteriaQuery));
 	}
 
 	@Override
-	public Query createQuery(CriteriaUpdate<?> updateQuery) {
-		return null;
+	public Query<?> createQuery(CriteriaUpdate<?> updateQuery) {
+		return execute(session -> session.createQuery(updateQuery));
 	}
 
 	@Override
-	public Query createQuery(CriteriaDelete<?> deleteQuery) {
-		return null;
+	public Query<?> createQuery(CriteriaDelete<?> deleteQuery) {
+		return execute(session -> session.createQuery(deleteQuery));
 	}
 
 	@Override
-	public NativeQuery createNativeQuery(String sqlString) {
+	public NativeQuery<?> createNativeQuery(String sqlString) {
 		return null;
 	}
 
@@ -522,37 +552,23 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 	}
 
 	@Override
-	public Query getNamedQuery(String queryName) {
+	public Query<?> getNamedQuery(String queryName) {
 		return null;
 	}
 
 	@Override
-	public NativeQuery getNamedNativeQuery(String name) {
+	public NativeQuery<?> getNamedNativeQuery(String name) {
 		return null;
 	}
 
 	@Override
-	public NativeQuery getNamedNativeQuery(String name, String resultSetMapping) {
+	public NativeQuery<?> getNamedNativeQuery(String name, String resultSetMapping) {
 		return null;
 	}
 
 	@Override
 	public StatelessSession getTargetStatelessSession() {
 		return null;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof StatelessSessionProxyImpl that)) {
-			return false;
-		}
-
-		return Objects.equals(sessionFactory, that.sessionFactory) && Objects.equals(dataSource, that.dataSource);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(sessionFactory, dataSource);
 	}
 
 	@Override
