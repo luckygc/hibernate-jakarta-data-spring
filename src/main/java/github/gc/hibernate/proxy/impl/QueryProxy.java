@@ -13,9 +13,6 @@ import org.hibernate.transform.ResultTransformer;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -42,7 +39,7 @@ public class QueryProxy<R> implements Query<R> {
 
 	@Override
 	public ScrollableResults<R> scroll() {
-		return execute(() -> this.delegate.scroll());
+		return execute(this.delegate::scroll);
 	}
 
 	@Override
@@ -86,8 +83,8 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public KeyedResultList<R> getKeyedResultList(KeyedPage page) {
-		return execute(this.delegate::getKeyedResultList, page);
+	public KeyedResultList<R> getKeyedResultList(KeyedPage<R> page) {
+		return execute(() -> this.delegate.getKeyedResultList(page));
 	}
 
 	@Override
@@ -516,22 +513,24 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public <P> Query<R> setParameterList(QueryParameter<P> parameter, P[] arguments){
+	public <P> Query<R> setParameterList(QueryParameter<P> parameter, P[] arguments) {
 		return this.delegate.setParameterList(parameter, arguments);
 	}
 
 	@Override
-	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments, BindableType<P> type) {
+	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments,
+			BindableType<P> type) {
 		return this.delegate.setParameterList(parameter, arguments, type);
 	}
 
 	@Override
-	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments, Class<P> javaType){
+	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments,
+			Class<P> javaType) {
 		return this.delegate.setParameterList(parameter, arguments, javaType);
 	}
 
 	@Override
-	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments){
+	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments) {
 		return this.delegate.setParameterList(parameter, arguments);
 	}
 
@@ -541,7 +540,7 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public <P> Query<R> setParameterList(int parameter, P[] arguments, Class<P> javaType){
+	public <P> Query<R> setParameterList(int parameter, P[] arguments, Class<P> javaType) {
 		return this.delegate.setParameterList(parameter, arguments, javaType);
 	}
 
@@ -576,17 +575,17 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public Query<R> setParameter(Parameter<Date> parameter, Date argument, TemporalType temporalType){
+	public Query<R> setParameter(Parameter<Date> parameter, Date argument, TemporalType temporalType) {
 		return this.delegate.setParameter(parameter, argument, temporalType);
 	}
 
 	@Override
-	public 	Query<R> setParameter(Parameter<Calendar> parameter, Calendar argument, TemporalType temporalType){
+	public Query<R> setParameter(Parameter<Calendar> parameter, Calendar argument, TemporalType temporalType) {
 		return this.delegate.setParameter(parameter, argument, temporalType);
 	}
 
 	@Override
-	public <T> Query<R> setParameter(Parameter<T> parameter, T argument){
+	public <T> Query<R> setParameter(Parameter<T> parameter, T argument) {
 		return this.delegate.setParameter(parameter, argument);
 	}
 
@@ -596,7 +595,7 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public <P> Query<R> setParameter(QueryParameter<P> parameter, P argument, Class<P> type){
+	public <P> Query<R> setParameter(QueryParameter<P> parameter, P argument, Class<P> type) {
 		return this.delegate.setParameter(parameter, argument, type);
 	}
 
@@ -606,7 +605,7 @@ public class QueryProxy<R> implements Query<R> {
 	}
 
 	@Override
-	public <P> Query<R> setParameter(int parameter, P argument, BindableType<P> type){
+	public <P> Query<R> setParameter(int parameter, P argument, BindableType<P> type) {
 		return this.delegate.setParameter(parameter, argument, type);
 	}
 
@@ -633,30 +632,6 @@ public class QueryProxy<R> implements Query<R> {
 	private <T> T execute(Supplier<T> supplier) {
 		try {
 			return supplier.get();
-		} finally {
-			StatelessSessionUtils.closeStatelessSession(this.session);
-		}
-	}
-
-	private long execute(LongSupplier supplier) {
-		try {
-			return supplier.getAsLong();
-		} finally {
-			StatelessSessionUtils.closeStatelessSession(this.session);
-		}
-	}
-
-	private int execute(IntSupplier supplier) {
-		try {
-			return supplier.getAsInt();
-		} finally {
-			StatelessSessionUtils.closeStatelessSession(this.session);
-		}
-	}
-
-	private <P, T> T execute(Function<P, T> function, P param) {
-		try {
-			return function.apply(param);
 		} finally {
 			StatelessSessionUtils.closeStatelessSession(this.session);
 		}
