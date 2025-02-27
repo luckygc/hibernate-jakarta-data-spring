@@ -10,6 +10,8 @@ import org.hibernate.query.*;
 import org.hibernate.query.restriction.Restriction;
 import org.hibernate.query.spi.QueryOptions;
 import org.hibernate.transform.ResultTransformer;
+import org.jspecify.annotations.NonNull;
+import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.*;
@@ -22,7 +24,10 @@ public class QueryProxy<R> implements Query<R> {
 	private final Query<R> delegate;
 	private final StatelessSession session;
 
-	public QueryProxy(Query<R> delegate, StatelessSession session) {
+	public QueryProxy(@NonNull Query<R> delegate, @NonNull StatelessSession session) {
+		Assert.notNull(delegate, "Query delegate must not be null");
+		Assert.notNull(session, "StatelessSession must not be null");
+
 		this.delegate = delegate;
 		this.session = session;
 	}
