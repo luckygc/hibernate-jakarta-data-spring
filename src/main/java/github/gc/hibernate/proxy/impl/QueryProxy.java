@@ -1,6 +1,6 @@
 package github.gc.hibernate.proxy.impl;
 
-import github.gc.hibernate.StatelessSessionUtils;
+import github.gc.hibernate.proxy.QueryProxySupport;
 import jakarta.persistence.*;
 import org.hibernate.*;
 import org.hibernate.graph.GraphSemantic;
@@ -15,21 +15,18 @@ import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SuppressWarnings("deprecation")
-public class QueryProxy<R> implements Query<R> {
+public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	private final Query<R> delegate;
-	private final StatelessSession session;
 
 	public QueryProxy(@NonNull Query<R> delegate, @NonNull StatelessSession session) {
-		Assert.notNull(delegate, "Query delegate must not be null");
-		Assert.notNull(session, "StatelessSession must not be null");
+		super(session);
 
+		Assert.notNull(delegate, "delegate must not be null");
 		this.delegate = delegate;
-		this.session = session;
 	}
 
 	@Override
@@ -632,13 +629,5 @@ public class QueryProxy<R> implements Query<R> {
 	@Override
 	public <T> Query<T> setTupleTransformer(TupleTransformer<T> transformer) {
 		return this.delegate.setTupleTransformer(transformer);
-	}
-
-	private <T> T execute(Supplier<T> supplier) {
-		try {
-			return supplier.get();
-		} finally {
-			StatelessSessionUtils.closeStatelessSession(this.session);
-		}
 	}
 }

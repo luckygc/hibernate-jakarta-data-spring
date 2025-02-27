@@ -1,6 +1,6 @@
 package github.gc.hibernate.proxy.impl;
 
-import github.gc.hibernate.StatelessSessionUtils;
+import github.gc.hibernate.proxy.QueryProxySupport;
 import jakarta.persistence.*;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.hibernate.*;
@@ -18,21 +18,18 @@ import org.springframework.util.Assert;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SuppressWarnings("deprecation")
-public class NativeQueryProxy<T> implements NativeQuery<T> {
+public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuery<T> {
 
 	private final NativeQuery<T> delegate;
-	private final StatelessSession session;
 
 	public NativeQueryProxy(@NonNull NativeQuery<T> delegate, @NonNull StatelessSession session) {
-		Assert.notNull(delegate, "Delegate must not be null");
-		Assert.notNull(session, "Session must not be null");
+		super(session);
 
+		Assert.notNull(delegate, "delegate must not be null");
 		this.delegate = delegate;
-		this.session = session;
 	}
 
 	@Override
@@ -779,13 +776,5 @@ public class NativeQueryProxy<T> implements NativeQuery<T> {
 	@Override
 	public NativeQuery<T> setProperties(Map bean) {
 		return this.delegate.setProperties(bean);
-	}
-
-	private <R> R execute(Supplier<R> supplier) {
-		try {
-			return supplier.get();
-		} finally {
-			StatelessSessionUtils.closeStatelessSession(this.session);
-		}
 	}
 }
