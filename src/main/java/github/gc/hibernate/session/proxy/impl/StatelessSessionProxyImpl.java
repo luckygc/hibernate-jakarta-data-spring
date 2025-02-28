@@ -25,6 +25,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -555,38 +556,69 @@ public class StatelessSessionProxyImpl implements StatelessSessionProxy {
 
 	private <R> R execute(Function<StatelessSession, R> function) {
 		StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
-		boolean needImmediatelyClose = false;
+		boolean isNewSs = false;
 		if (session == null) {
 			session = sessionFactory.openStatelessSession();
-			needImmediatelyClose = true;
+			isNewSs = true;
 		}
 
 		try {
 			R result = function.apply(session);
 			if (result instanceof NativeQuery<?> nativeQuery) {
-				needImmediatelyClose = false;
-				return ((R) new NativeQueryProxy<>(nativeQuery, session));
-			}
+				if (isNewSs) {
+					result = ((R) new NativeQueryProxy<>(nativeQuery, session));
+					isNewSs = false;
+				} else {
+					applyTransactionTimeout(result);
+				}
 
-			if (result instanceof Query<?> query) {
-				needImmediatelyClose = false;
-				return ((R) new QueryProxy<>(query, session));
-			}
-
-			if (result instanceof SelectionQuery<?> selectionQuery) {
-				needImmediatelyClose = false;
-				return ((R) new SelectionQueryProxy<>(selectionQuery, session));
-			}
-
-			if (result instanceof MutationQuery mutationQuery) {
-				needImmediatelyClose = false;
-				return ((R) new MutationQueryProxy(mutationQuery, session));
+			} else if (result instanceof Query<?> query) {
+				if (isNewSs) {
+					result = ((R) new QueryProxy<>(query, session));
+					isNewSs = false;
+				} else {
+					applyTransactionTimeout(result);
+				}
+			} else if (result instanceof SelectionQuery<?> selectionQuery) {
+				if (isNewSs) {
+					result = ((R) new SelectionQueryProxy<>(selectionQuery, session));
+					isNewSs = false;
+				} else {
+					applyTransactionTimeout(result);
+				}
+			} else if (result instanceof MutationQuery mutationQuery) {
+				if (isNewSs) {
+					result = ((R) new MutationQueryProxy(mutationQuery, session));
+					isNewSs = false;
+				} else {
+					applyTransactionTimeout(result);
+				}
 			}
 
 			return result;
 		} finally {
-			if (needImmediatelyClose) {
+			if (isNewSs) {
 				StatelessSessionUtils.closeStatelessSession(session);
+			}
+		}
+	}
+
+	private <R> void applyTransactionTimeout(R query) {
+		ConnectionHolder connHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
+		if (connHolder != null && connHolder.hasTimeout()) {
+			int timeoutValue = connHolder.getTimeToLiveInSeconds();
+			try {
+				if (query instanceof NativeQuery<?> nativeQuery) {
+					nativeQuery.setTimeout(timeoutValue);
+				} else if (query instanceof Query<?> q) {
+					q.setTimeout(timeoutValue);
+				} else if (query instanceof SelectionQuery<?> selectionQuery) {
+					selectionQuery.setTimeout(timeoutValue);
+				} else if (query instanceof MutationQuery mutationQuery) {
+					mutationQuery.setTimeout(timeoutValue);
+				}
+			} catch (IllegalArgumentException ex) {
+				// oh well, at least we tried...
 			}
 		}
 	}
