@@ -1,4 +1,4 @@
-package github.gc.demo;
+package github.gc.demo.model;
 
 import jakarta.persistence.*;
 
@@ -26,5 +26,10 @@ public class TestModel {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "TestModel{" + "id=" + id + ", name='" + name + '\'' + '}';
 	}
 }

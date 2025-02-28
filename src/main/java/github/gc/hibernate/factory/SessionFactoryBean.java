@@ -85,7 +85,7 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 		this.hibernateProperties = hibernateProperties;
 	}
 
-	public void setPackagesToScan(String[] packagesToScan) {
+	public void setPackagesToScanEntity(String[] packagesToScan) {
 		this.packagesToScan = packagesToScan;
 	}
 }

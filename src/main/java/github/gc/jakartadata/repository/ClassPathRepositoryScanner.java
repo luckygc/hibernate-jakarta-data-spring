@@ -12,7 +12,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.lang.NonNullApi;
 import org.springframework.util.Assert;
 
 import java.util.Set;
@@ -66,7 +65,7 @@ public class ClassPathRepositoryScanner extends ClassPathBeanDefinitionScanner {
 			ConstructorArgumentValues constructorArgumentValues = definition.getConstructorArgumentValues();
 			constructorArgumentValues.addGenericArgumentValue(beanClassName);
 
-			definition.setBeanClass(RepositoryFactoryBean.class);
+			definition.setBeanClass(RepositoryBean.class);
 			definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		}
 	}

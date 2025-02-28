@@ -13,14 +13,14 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@RepositoryScan(basePackages = "github.gc.demo")
+@RepositoryScan(basePackages = "github.gc.**.repository")
 public class DataConfiguration {
 
 	@Bean
 	public SessionFactory sessionFactory(DataSource dataSource) {
 		SessionFactoryBean sessionFactoryBean = new SessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
-		sessionFactoryBean.setPackagesToScan(new String[]{"github.gc.demo"});
+		sessionFactoryBean.setPackagesToScanEntity(new String[]{"github.gc.**.model"});
 		Properties properties = sessionFactoryBean.getHibernateProperties();
 		properties.put(AvailableSettings.SHOW_SQL, "true");
 		properties.put(AvailableSettings.FORMAT_SQL, "true");

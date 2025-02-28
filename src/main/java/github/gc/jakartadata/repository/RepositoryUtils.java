@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
-public final class RepositoryFactoryUtils {
+public final class RepositoryUtils {
 
-	private RepositoryFactoryUtils() {
+	private RepositoryUtils() {
 	}
 
 	private static final Map<Class<?>, Class<?>> repositoryImplClasses = new ConcurrentHashMap<>(64);
@@ -37,7 +37,7 @@ public final class RepositoryFactoryUtils {
 		Assert.notNull(repositoryInterface, "repositoryInterface must not be null");
 
 		return (Class<I>) repositoryImplClasses.computeIfAbsent(repositoryInterface,
-				RepositoryFactoryUtils::doGetRepositoryImplClass);
+				RepositoryUtils::doGetRepositoryImplClass);
 	}
 
 	private static Class<?> doGetRepositoryImplClass(Class<?> repositoryInterface) {
