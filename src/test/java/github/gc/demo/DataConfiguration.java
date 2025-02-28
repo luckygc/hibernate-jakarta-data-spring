@@ -25,6 +25,7 @@ public class DataConfiguration {
 		properties.put(AvailableSettings.SHOW_SQL, "true");
 		properties.put(AvailableSettings.FORMAT_SQL, "true");
 		properties.put(AvailableSettings.HBM2DDL_AUTO, "update");
+		properties.put(AvailableSettings.USE_SQL_COMMENTS, "true");
 		return sessionFactoryBean.getObject();
 	}
 
