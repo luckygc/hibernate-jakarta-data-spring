@@ -22,6 +22,7 @@ import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaInsert;
 import org.hibernate.query.criteria.JpaCriteriaInsertSelect;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -30,12 +31,12 @@ import org.springframework.util.Assert;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * 注入到repository的StatelessSession代理，不使用jdk代理，防止接口方法变更无法及时发现。
- * 线程安全，事务内使用线程绑定的session，常规操作操作完直接关闭。
- * StatelessSession默认连接管理策略是需要时获取连接，事务后释放，通过事务后
+ * 注入到repository的StatelessSession代理
+ * 线程安全，事务内使用线程绑定的session，常规操作新建session操作完关闭。
  */
 @SuppressWarnings({"deprecation", "unchecked"})
 public class StatelessSessionProxyImpl implements StatelessSession, StatelessSessionProxy {
@@ -53,29 +54,6 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 			this.dataSource = ds;
 		} else {
 			throw new IllegalArgumentException("SessionFactory must have a DataSource");
-		}
-	}
-
-	private <R> R execute(Function<StatelessSession, R> function) {
-		StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
-		boolean needImmediatelyClose = false;
-		if (session == null) {
-			session = sessionFactory.openStatelessSession();
-			needImmediatelyClose = true;
-		}
-
-		try {
-			R result = function.apply(session);
-			if (result instanceof Query<?> query) {
-				needImmediatelyClose = false;
-				return ((R) new QueryProxy<>(query, session));
-			}
-
-			return result;
-		} finally {
-			if (needImmediatelyClose) {
-				StatelessSessionUtils.closeStatelessSession(session);
-			}
 		}
 	}
 
@@ -458,121 +436,155 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 
 	@Override
 	public NativeQuery<?> createNativeQuery(String sqlString) {
-		return null;
+		return execute(session -> session.createNativeQuery(sqlString));
 	}
 
 	@Override
 	public <R> NativeQuery<R> createNativeQuery(String sqlString, Class<R> resultClass) {
-		return null;
+		return execute(session -> session.createNativeQuery(sqlString, resultClass));
 	}
 
 	@Override
 	public <R> NativeQuery<R> createNativeQuery(String sqlString, Class<R> resultClass, String tableAlias) {
-		return null;
+		return execute(session -> session.createNativeQuery(sqlString, resultClass, tableAlias));
 	}
 
 	@Override
-	public NativeQuery createNativeQuery(String sqlString, String resultSetMappingName) {
-		return null;
+	public NativeQuery<?> createNativeQuery(String sqlString, String resultSetMappingName) {
+		return execute(session -> session.createNativeQuery(sqlString, resultSetMappingName));
 	}
 
 	@Override
 	public <R> NativeQuery<R> createNativeQuery(String sqlString, String resultSetMappingName, Class<R> resultClass) {
-		return null;
+		return execute(session -> session.createNativeQuery(sqlString, resultSetMappingName, resultClass));
 	}
 
 	@Override
 	public SelectionQuery<?> createSelectionQuery(String hqlString) {
-		return null;
+		return execute(session -> session.createSelectionQuery(hqlString));
 	}
 
 	@Override
 	public <R> SelectionQuery<R> createSelectionQuery(String hqlString, Class<R> resultType) {
-		return null;
+		return execute(session -> session.createSelectionQuery(hqlString, resultType));
 	}
 
 	@Override
 	public <R> SelectionQuery<R> createSelectionQuery(CriteriaQuery<R> criteria) {
-		return null;
+		return execute(session -> session.createSelectionQuery(criteria));
 	}
 
 	@Override
 	public MutationQuery createMutationQuery(String hqlString) {
-		return null;
+		return execute(session -> session.createMutationQuery(hqlString));
 	}
 
 	@Override
 	public MutationQuery createMutationQuery(CriteriaUpdate<?> updateQuery) {
-		return null;
+		return execute(session -> session.createMutationQuery(updateQuery));
 	}
 
 	@Override
 	public MutationQuery createMutationQuery(CriteriaDelete<?> deleteQuery) {
-		return null;
+		return execute(session -> session.createMutationQuery(deleteQuery));
 	}
 
 	@Override
 	public MutationQuery createMutationQuery(JpaCriteriaInsertSelect<?> insertSelect) {
-		return null;
+		return execute(session -> session.createMutationQuery(insertSelect));
 	}
 
 	@Override
 	public MutationQuery createMutationQuery(JpaCriteriaInsert<?> insert) {
-		return null;
+		return execute(session -> session.createMutationQuery(insert));
 	}
 
 	@Override
 	public MutationQuery createNativeMutationQuery(String sqlString) {
-		return null;
+		return execute(session -> session.createNativeMutationQuery(sqlString));
 	}
 
 	@Override
 	public Query createNamedQuery(String name) {
-		return null;
+		return execute(session -> session.createNamedQuery(name));
 	}
 
 	@Override
 	public <R> Query<R> createNamedQuery(String name, Class<R> resultClass) {
-		return null;
+		return execute(session -> session.createNamedQuery(name, resultClass));
 	}
 
 	@Override
 	public SelectionQuery<?> createNamedSelectionQuery(String name) {
-		return null;
+		return execute(session -> session.createNamedSelectionQuery(name));
 	}
 
 	@Override
 	public <R> SelectionQuery<R> createNamedSelectionQuery(String name, Class<R> resultType) {
-		return null;
+		return execute(session -> session.createNamedSelectionQuery(name, resultType));
 	}
 
 	@Override
 	public MutationQuery createNamedMutationQuery(String name) {
-		return null;
+		return execute(session -> session.createNamedMutationQuery(name));
 	}
 
 	@Override
 	public Query<?> getNamedQuery(String queryName) {
-		return null;
+		return execute(session -> session.getNamedQuery(queryName));
 	}
 
 	@Override
 	public NativeQuery<?> getNamedNativeQuery(String name) {
-		return null;
+		return execute(session -> session.getNamedNativeQuery(name));
 	}
 
 	@Override
 	public NativeQuery<?> getNamedNativeQuery(String name, String resultSetMapping) {
-		return null;
+		return execute(session -> session.getNamedNativeQuery(name, resultSetMapping));
 	}
 
+	@Nullable
 	@Override
-	public StatelessSession getTargetStatelessSession() {
-		return null;
+	public StatelessSession getCurrentSession() {
+		return StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
 	}
 
 	@Override
 	public String toString() {
 		return "StatelessSession proxy for sessionFactory [%s]".formatted(this.sessionFactory);
+	}
+
+	private <R> R execute(Function<StatelessSession, R> function) {
+		StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
+		boolean needImmediatelyClose = false;
+		if (session == null) {
+			session = sessionFactory.openStatelessSession();
+			needImmediatelyClose = true;
+		}
+
+		try {
+			R result = function.apply(session);
+			if (result instanceof NativeQuery<?> nativeQuery) {
+				needImmediatelyClose = false;
+				return ((R) new NativeQueryProxy<>(nativeQuery, session));
+			}
+
+			if (result instanceof Query<?> query) {
+				needImmediatelyClose = false;
+				return ((R) new QueryProxy<>(query, session));
+			}
+
+			if (result instanceof SelectionQuery<?> selectionQuery) {
+				needImmediatelyClose = false;
+				return ((R) new SelectionQueryProxy<>(selectionQuery, session));
+			}
+
+			return result;
+		} finally {
+			if (needImmediatelyClose) {
+				StatelessSessionUtils.closeStatelessSession(session);
+			}
+		}
 	}
 }
