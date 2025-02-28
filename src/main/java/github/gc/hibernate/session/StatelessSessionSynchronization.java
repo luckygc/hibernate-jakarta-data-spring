@@ -1,4 +1,4 @@
-package github.gc.hibernate;
+package github.gc.hibernate.session;
 
 import org.hibernate.SessionFactory;
 import org.jspecify.annotations.NonNull;

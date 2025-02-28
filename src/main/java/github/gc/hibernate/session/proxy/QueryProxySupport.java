@@ -1,6 +1,6 @@
-package github.gc.hibernate.proxy;
+package github.gc.hibernate.session.proxy;
 
-import github.gc.hibernate.StatelessSessionUtils;
+import github.gc.hibernate.session.StatelessSessionUtils;
 import org.hibernate.StatelessSession;
 import org.jspecify.annotations.NonNull;
 import org.springframework.util.Assert;

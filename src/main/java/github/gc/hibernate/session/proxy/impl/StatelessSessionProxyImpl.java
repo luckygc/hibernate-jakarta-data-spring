@@ -1,7 +1,7 @@
-package github.gc.hibernate.proxy.impl;
+package github.gc.hibernate.session.proxy.impl;
 
-import github.gc.hibernate.StatelessSessionUtils;
-import github.gc.hibernate.proxy.StatelessSessionProxy;
+import github.gc.hibernate.session.StatelessSessionUtils;
+import github.gc.hibernate.session.proxy.StatelessSessionProxy;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.TypedQueryReference;
 import jakarta.persistence.criteria.CriteriaDelete;
@@ -30,8 +30,6 @@ import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -39,7 +37,7 @@ import java.util.function.Function;
  * 线程安全，事务内使用线程绑定的session，常规操作新建session操作完关闭。
  */
 @SuppressWarnings({"deprecation", "unchecked"})
-public class StatelessSessionProxyImpl implements StatelessSession, StatelessSessionProxy {
+public class StatelessSessionProxyImpl implements StatelessSessionProxy {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 

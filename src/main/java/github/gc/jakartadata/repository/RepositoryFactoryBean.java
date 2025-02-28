@@ -1,32 +1,25 @@
-package github.gc.jakartadata;
+package github.gc.jakartadata.repository;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.resource.jdbc.spi.StatementInspector;
+import github.gc.hibernate.session.proxy.StatelessSessionProxy;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DaoSupport;
 import org.springframework.util.Assert;
-
-import javax.sql.DataSource;
 
 public class RepositoryFactoryBean<T> extends DaoSupport implements FactoryBean<T> {
 
 	private final Class<T> repositoryInterface;
 
-	@Autowired
-	private SessionFactory sessionFactory;
-	@Autowired
-	private DataSource dataSource;
-	@Autowired(required = false)
-	private StatementInspector statementInspector;
+	private final StatelessSessionProxy sessionProxy;
 
-	public RepositoryFactoryBean(Class<T> repositoryInterface) {
+	public RepositoryFactoryBean(@NonNull Class<T> repositoryInterface, @NonNull StatelessSessionProxy sessionProxy) {
 		this.repositoryInterface = repositoryInterface;
+		this.sessionProxy = sessionProxy;
 	}
 
 	@Override
 	public T getObject() {
-		return null;
+		return RepositoryFactoryUtils.createRepository(this.repositoryInterface, this.sessionProxy);
 	}
 
 	@Override
@@ -42,8 +35,7 @@ public class RepositoryFactoryBean<T> extends DaoSupport implements FactoryBean<
 	@Override
 	protected void checkDaoConfig() throws IllegalArgumentException {
 		Assert.notNull(this.repositoryInterface, "Property 'repositoryInterface' is required");
-		Assert.notNull(this.sessionFactory, "Property 'sessionFactory' is required");
-		Assert.notNull(this.dataSource, "Property 'dataSource' is required");
+		Assert.notNull(this.sessionProxy, "Property 'sessionProxy' is required");
 
 		Class<? extends T> ignore = RepositoryFactoryUtils.getRepositoryImplClass(repositoryInterface);
 	}

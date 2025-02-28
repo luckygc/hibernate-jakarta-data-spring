@@ -1,4 +1,4 @@
-package github.gc.hibernate;
+package github.gc.hibernate.factory;
 
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
@@ -20,8 +20,6 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 
 	private String[] packagesToScan;
 
-	private Configuration configuration;
-
 	private SessionFactory sessionFactory;
 
 	@Override
@@ -40,12 +38,15 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 			sfb.scanPackages(this.packagesToScan);
 		}
 
-		this.configuration = sfb;
 		this.sessionFactory = sfb.buildSessionFactory();
 	}
 
 	@Override
 	public SessionFactory getObject() {
+		if (this.sessionFactory == null) {
+			afterPropertiesSet();
+		}
+
 		return this.sessionFactory;
 	}
 
@@ -66,13 +67,6 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 		}
 	}
 
-	public final Configuration getConfiguration() {
-		if (this.configuration == null) {
-			throw new IllegalStateException("Configuration not initialized yet");
-		}
-		return this.configuration;
-	}
-
 	public Properties getHibernateProperties() {
 		if (this.hibernateProperties == null) {
 			this.hibernateProperties = new Properties();
@@ -80,16 +74,8 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 		return this.hibernateProperties;
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
-
-	public Interceptor getEntityInterceptor() {
-		return entityInterceptor;
 	}
 
 	public void setEntityInterceptor(Interceptor entityInterceptor) {
@@ -100,23 +86,7 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 		this.hibernateProperties = hibernateProperties;
 	}
 
-	public String[] getPackagesToScan() {
-		return packagesToScan;
-	}
-
 	public void setPackagesToScan(String[] packagesToScan) {
 		this.packagesToScan = packagesToScan;
-	}
-
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
 	}
 }

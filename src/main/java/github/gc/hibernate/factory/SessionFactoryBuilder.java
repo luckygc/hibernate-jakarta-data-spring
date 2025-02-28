@@ -1,10 +1,9 @@
-package github.gc.hibernate;
+package github.gc.hibernate.factory;
 
 import jakarta.data.repository.Repository;
 import jakarta.persistence.*;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.cache.spi.access.AccessType;

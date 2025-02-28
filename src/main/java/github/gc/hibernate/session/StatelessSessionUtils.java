@@ -1,6 +1,5 @@
-package github.gc.hibernate;
+package github.gc.hibernate.session;
 
-import github.gc.hibernate.proxy.StatelessSessionProxy;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.jspecify.annotations.NonNull;

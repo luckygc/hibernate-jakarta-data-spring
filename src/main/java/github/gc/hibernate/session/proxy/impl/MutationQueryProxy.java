@@ -1,6 +1,6 @@
-package github.gc.hibernate.proxy.impl;
+package github.gc.hibernate.session.proxy.impl;
 
-import github.gc.hibernate.proxy.QueryProxySupport;
+import github.gc.hibernate.session.proxy.QueryProxySupport;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.Parameter;
 import jakarta.persistence.TemporalType;
