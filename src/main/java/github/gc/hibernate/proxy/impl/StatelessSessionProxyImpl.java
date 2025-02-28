@@ -580,6 +580,11 @@ public class StatelessSessionProxyImpl implements StatelessSession, StatelessSes
 				return ((R) new SelectionQueryProxy<>(selectionQuery, session));
 			}
 
+			if (result instanceof MutationQuery mutationQuery) {
+				needImmediatelyClose = false;
+				return ((R) new MutationQueryProxy(mutationQuery, session));
+			}
+
 			return result;
 		} finally {
 			if (needImmediatelyClose) {
