@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
-@SuppressWarnings("deprecation")
 public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuery<T> {
 
 	private final NativeQuery<T> delegate;
@@ -34,46 +33,54 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addScalar(String columnAlias) {
-		return this.delegate.addScalar(columnAlias);
+		this.delegate.addScalar(columnAlias);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addScalar(String columnAlias, BasicTypeReference type) {
-		return this.delegate.addScalar(columnAlias, type);
+		this.delegate.addScalar(columnAlias, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addScalar(String columnAlias, BasicDomainType type) {
-		return this.delegate.addScalar(columnAlias, type);
+		this.delegate.addScalar(columnAlias, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addScalar(String columnAlias, Class javaType) {
-		return this.delegate.addScalar(columnAlias, javaType);
+		this.delegate.addScalar(columnAlias, javaType);
+		return this;
 	}
 
 	@Override
 	public <C> NativeQuery<T> addScalar(String columnAlias, Class<C> relationalJavaType,
 			AttributeConverter<?, C> converter) {
-		return this.delegate.addScalar(columnAlias, relationalJavaType, converter);
+		this.delegate.addScalar(columnAlias, relationalJavaType, converter);
+		return this;
 	}
 
 	@Override
 	public <O, R> NativeQuery<T> addScalar(String columnAlias, Class<O> domainJavaType, Class<R> jdbcJavaType,
 			AttributeConverter<O, R> converter) {
-		return this.delegate.addScalar(columnAlias, domainJavaType, jdbcJavaType, converter);
+		this.delegate.addScalar(columnAlias, domainJavaType, jdbcJavaType, converter);
+		return this;
 	}
 
 	@Override
 	public <C> NativeQuery<T> addScalar(String columnAlias, Class<C> relationalJavaType,
 			Class<? extends AttributeConverter<?, C>> converter) {
-		return this.delegate.addScalar(columnAlias, relationalJavaType, converter);
+		this.delegate.addScalar(columnAlias, relationalJavaType, converter);
+		return this;
 	}
 
 	@Override
 	public <O, R> NativeQuery<T> addScalar(String columnAlias, Class<O> domainJavaType, Class<R> jdbcJavaType,
 			Class<? extends AttributeConverter<O, R>> converter) {
-		return this.delegate.addScalar(columnAlias, domainJavaType, jdbcJavaType, converter);
+		this.delegate.addScalar(columnAlias, domainJavaType, jdbcJavaType, converter);
+		return this;
 	}
 
 	@Override
@@ -83,17 +90,20 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addAttributeResult(String columnAlias, Class entityJavaType, String attributePath) {
-		return this.delegate.addAttributeResult(columnAlias, entityJavaType, attributePath);
+		this.delegate.addAttributeResult(columnAlias, entityJavaType, attributePath);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addAttributeResult(String columnAlias, String entityName, String attributePath) {
-		return this.delegate.addAttributeResult(columnAlias, entityName, attributePath);
+		this.delegate.addAttributeResult(columnAlias, entityName, attributePath);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addAttributeResult(String columnAlias, SingularAttribute attribute) {
-		return this.delegate.addAttributeResult(columnAlias, attribute);
+		this.delegate.addAttributeResult(columnAlias, attribute);
+		return this;
 	}
 
 	@Override
@@ -108,32 +118,38 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addEntity(String entityName) {
-		return this.delegate.addEntity(entityName);
+		this.delegate.addEntity(entityName);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addEntity(String tableAlias, String entityName) {
-		return this.delegate.addEntity(tableAlias, entityName);
+		this.delegate.addEntity(tableAlias, entityName);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addEntity(String tableAlias, String entityName, LockMode lockMode) {
-		return this.delegate.addEntity(tableAlias, entityName, lockMode);
+		this.delegate.addEntity(tableAlias, entityName, lockMode);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addEntity(Class entityType) {
-		return this.delegate.addEntity(entityType);
+		this.delegate.addEntity(entityType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addEntity(String tableAlias, Class entityType) {
-		return this.delegate.addEntity(tableAlias, entityType);
+		this.delegate.addEntity(tableAlias, entityType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addEntity(String tableAlias, Class entityClass, LockMode lockMode) {
-		return this.delegate.addEntity(tableAlias, entityClass, lockMode);
+		this.delegate.addEntity(tableAlias, entityClass, lockMode);
+		return this;
 	}
 
 	@Override
@@ -143,17 +159,20 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addJoin(String tableAlias, String path) {
-		return this.delegate.addJoin(tableAlias, path);
+		this.delegate.addJoin(tableAlias, path);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addJoin(String tableAlias, String ownerTableAlias, String joinPropertyName) {
-		return this.delegate.addJoin(tableAlias, ownerTableAlias, joinPropertyName);
+		this.delegate.addJoin(tableAlias, ownerTableAlias, joinPropertyName);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addJoin(String tableAlias, String path, LockMode lockMode) {
-		return this.delegate.addJoin(tableAlias, path, lockMode);
+		this.delegate.addJoin(tableAlias, path, lockMode);
+		return this;
 	}
 
 	@Override
@@ -163,22 +182,25 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addSynchronizedQuerySpace(String querySpace) {
-		return this.delegate.addSynchronizedQuerySpace(querySpace);
+		this.delegate.addSynchronizedQuerySpace(querySpace);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addSynchronizedEntityName(String entityName) throws MappingException {
-		return this.delegate.addSynchronizedEntityName(entityName);
+		this.delegate.addSynchronizedEntityName(entityName);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> addSynchronizedEntityClass(Class entityClass) throws MappingException {
-		return this.delegate.addSynchronizedEntityClass(entityClass);
+		this.delegate.addSynchronizedEntityClass(entityClass);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setHibernateFlushMode(FlushMode flushMode) {
-		return this.delegate.setHibernateFlushMode(flushMode);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -193,37 +215,41 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setQueryFlushMode(QueryFlushMode queryFlushMode) {
-		return this.delegate.setQueryFlushMode(queryFlushMode);
+		this.delegate.setQueryFlushMode(queryFlushMode);
+		return this;
 	}
 
 	@Override
 	public FlushModeType getFlushMode() {
-		return this.delegate.getFlushMode();
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public NativeQuery<T> setFlushMode(FlushModeType flushMode) {
-		return this.delegate.setFlushMode(flushMode);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public FlushMode getHibernateFlushMode() {
-		return this.delegate.getHibernateFlushMode();
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public NativeQuery<T> setCacheMode(CacheMode cacheMode) {
-		return this.delegate.setCacheMode(cacheMode);
+		this.delegate.setCacheMode(cacheMode);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setCacheStoreMode(CacheStoreMode cacheStoreMode) {
-		return this.delegate.setCacheStoreMode(cacheStoreMode);
+		this.delegate.setCacheStoreMode(cacheStoreMode);
+		return this;
 	}
 
 	@Override
 	public TypedQuery<T> setTimeout(Integer integer) {
-		return this.delegate.setTimeout(integer);
+		this.delegate.setTimeout(integer);
+		return this;
 	}
 
 	@Override
@@ -233,7 +259,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setCacheRetrieveMode(CacheRetrieveMode cacheRetrieveMode) {
-		return this.delegate.setCacheRetrieveMode(cacheRetrieveMode);
+		this.delegate.setCacheRetrieveMode(cacheRetrieveMode);
+		return this;
 	}
 
 	@Override
@@ -243,7 +270,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setCacheable(boolean cacheable) {
-		return this.delegate.setCacheable(cacheable);
+		this.delegate.setCacheable(cacheable);
+		return this;
 	}
 
 	@Override
@@ -253,7 +281,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public SelectionQuery<T> setQueryPlanCacheable(boolean queryPlanCacheable) {
-		return this.delegate.setQueryPlanCacheable(queryPlanCacheable);
+		this.delegate.setQueryPlanCacheable(queryPlanCacheable);
+		return this;
 	}
 
 	@Override
@@ -263,17 +292,20 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setCacheRegion(String cacheRegion) {
-		return this.delegate.setCacheRegion(cacheRegion);
+		this.delegate.setCacheRegion(cacheRegion);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setTimeout(int timeout) {
-		return this.delegate.setTimeout(timeout);
+		this.delegate.setTimeout(timeout);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setFetchSize(int fetchSize) {
-		return this.delegate.setFetchSize(fetchSize);
+		this.delegate.setFetchSize(fetchSize);
+		return this;
 	}
 
 	@Override
@@ -283,7 +315,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setReadOnly(boolean readOnly) {
-		return this.delegate.setReadOnly(readOnly);
+		this.delegate.setReadOnly(readOnly);
+		return this;
 	}
 
 	@Override
@@ -298,12 +331,14 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setLockOptions(LockOptions lockOptions) {
-		return this.delegate.setLockOptions(lockOptions);
+		this.delegate.setLockOptions(lockOptions);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setLockMode(String alias, LockMode lockMode) {
-		return this.delegate.setLockMode(alias, lockMode);
+		this.delegate.setLockMode(alias, lockMode);
+		return this;
 	}
 
 	@Override
@@ -383,17 +418,17 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public Query<T> applyGraph(RootGraph graph, GraphSemantic semantic) {
-		return this.delegate.applyGraph(graph, semantic);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<T> applyFetchGraph(RootGraph graph) {
-		return this.delegate.applyFetchGraph(graph);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<T> applyLoadGraph(RootGraph graph) {
-		return this.delegate.applyLoadGraph(graph);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -403,7 +438,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setComment(String comment) {
-		return this.delegate.setComment(comment);
+		this.delegate.setComment(comment);
+		return this;
 	}
 
 	@Override
@@ -413,12 +449,14 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> addQueryHint(String hint) {
-		return this.delegate.addQueryHint(hint);
+		this.delegate.addQueryHint(hint);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setMaxResults(int maxResults) {
-		return this.delegate.setMaxResults(maxResults);
+		this.delegate.setMaxResults(maxResults);
+		return this;
 	}
 
 	@Override
@@ -428,12 +466,14 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setFirstResult(int startPosition) {
-		return this.delegate.setFirstResult(startPosition);
+		this.delegate.setFirstResult(startPosition);
+		return this;
 	}
 
 	@Override
 	public Query<T> setPage(Page page) {
-		return this.delegate.setPage(page);
+		this.delegate.setPage(page);
+		return this;
 	}
 
 	@Override
@@ -453,7 +493,8 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setHint(String hintName, Object value) {
-		return this.delegate.setHint(hintName, value);
+		this.delegate.setHint(hintName, value);
+		return this;
 	}
 
 	@Override
@@ -463,17 +504,20 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public Query<T> setEntityGraph(EntityGraph<T> graph, GraphSemantic semantic) {
-		return this.delegate.setEntityGraph(graph, semantic);
+		this.delegate.setEntityGraph(graph, semantic);
+		return this;
 	}
 
 	@Override
 	public Query<T> enableFetchProfile(String profileName) {
-		return this.delegate.enableFetchProfile(profileName);
+		this.delegate.enableFetchProfile(profileName);
+		return this;
 	}
 
 	@Override
 	public Query<T> disableFetchProfile(String profileName) {
-		return this.delegate.disableFetchProfile(profileName);
+		this.delegate.disableFetchProfile(profileName);
+		return this;
 	}
 
 	@Override
@@ -488,42 +532,50 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public NativeQuery<T> setLockMode(LockModeType lockMode) {
-		return this.delegate.setLockMode(lockMode);
+		this.delegate.setLockMode(lockMode);
+		return this;
 	}
 
 	@Override
 	public Query<T> setOrder(List<? extends Order<? super T>> orderList) {
-		return this.delegate.setOrder(orderList);
+		this.delegate.setOrder(orderList);
+		return this;
 	}
 
 	@Override
 	public Query<T> setOrder(Order<? super T> order) {
-		return this.delegate.setOrder(order);
+		this.delegate.setOrder(order);
+		return this;
 	}
 
 	@Override
 	public Query<T> addRestriction(Restriction<? super T> restriction) {
-		return this.delegate.addRestriction(restriction);
+		this.delegate.addRestriction(restriction);
+		return this;
 	}
 
 	@Override
 	public SelectionQuery<T> setFollowOnLocking(boolean enable) {
-		return this.delegate.setFollowOnLocking(enable);
+		this.delegate.setFollowOnLocking(enable);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setHibernateLockMode(LockMode lockMode) {
-		return this.delegate.setHibernateLockMode(lockMode);
+		this.delegate.setHibernateLockMode(lockMode);
+		return this;
 	}
 
 	@Override
 	public <R> NativeQuery<R> setTupleTransformer(TupleTransformer<R> transformer) {
-		return this.delegate.setTupleTransformer(transformer);
+		this.delegate.setTupleTransformer(transformer);
+		return (NativeQuery<R>) this;
 	}
 
 	@Override
 	public NativeQuery<T> setResultListTransformer(ResultListTransformer<T> transformer) {
-		return this.delegate.setResultListTransformer(transformer);
+		this.delegate.setResultListTransformer(transformer);
+		return this;
 	}
 
 	@Override
@@ -538,67 +590,78 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public <S> NativeQuery<S> setResultTransformer(ResultTransformer<S> transformer) {
-		return this.delegate.setResultTransformer(transformer);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(String name, Object value) {
-		return this.delegate.setParameter(name, value);
+		this.delegate.setParameter(name, value);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(String name, P val, Class<P> type) {
-		return this.delegate.setParameter(name, val, type);
+		this.delegate.setParameter(name, val, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(String name, P val, BindableType<P> type) {
-		return this.delegate.setParameter(name, val, type);
+		this.delegate.setParameter(name, val, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(String name, Instant value, TemporalType temporalType) {
-		return this.delegate.setParameter(name, value, temporalType);
+		this.delegate.setParameter(name, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(String name, Calendar value, TemporalType temporalType) {
-		return this.delegate.setParameter(name, value, temporalType);
+		this.delegate.setParameter(name, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(String name, Date value, TemporalType temporalType) {
-		return this.delegate.setParameter(name, value, temporalType);
+		this.delegate.setParameter(name, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(int position, Object value) {
-		return this.delegate.setParameter(position, value);
+		this.delegate.setParameter(position, value);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(int position, P val, Class<P> type) {
-		return this.delegate.setParameter(position, val, type);
+		this.delegate.setParameter(position, val, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(int position, P val, BindableType<P> type) {
-		return this.delegate.setParameter(position, val, type);
+		this.delegate.setParameter(position, val, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(int position, Instant value, TemporalType temporalType) {
-		return this.delegate.setParameter(position, value, temporalType);
+		this.delegate.setParameter(position, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(int position, Calendar value, TemporalType temporalType) {
-		return this.delegate.setParameter(position, value, temporalType);
+		this.delegate.setParameter(position, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(int position, Date value, TemporalType temporalType) {
-		return this.delegate.setParameter(position, value, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -648,133 +711,159 @@ public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuer
 
 	@Override
 	public <P> NativeQuery<T> setParameter(QueryParameter<P> parameter, P val) {
-		return this.delegate.setParameter(parameter, val);
+		this.delegate.setParameter(parameter, val);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(QueryParameter<P> parameter, P val, Class<P> type) {
-		return this.delegate.setParameter(parameter, val, type);
+		this.delegate.setParameter(parameter, val, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(QueryParameter<P> parameter, P val, BindableType<P> type) {
-		return this.delegate.setParameter(parameter, val, type);
+		this.delegate.setParameter(parameter, val, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameter(Parameter<P> param, P value) {
-		return this.delegate.setParameter(param, value);
+		this.delegate.setParameter(param, value);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(Parameter<Calendar> param, Calendar value, TemporalType temporalType) {
-		return this.delegate.setParameter(param, value, temporalType);
+		this.delegate.setParameter(param, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameter(Parameter<Date> param, Date value, TemporalType temporalType) {
-		return this.delegate.setParameter(param, value, temporalType);
+		this.delegate.setParameter(param, value, temporalType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameterList(String name, Collection values) {
-		return this.delegate.setParameterList(name, values);
+		this.delegate.setParameterList(name, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(String name, Collection<? extends P> values, Class<P> type) {
-		return this.delegate.setParameterList(name, values, type);
+		this.delegate.setParameterList(name, values, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(String name, Collection<? extends P> values, BindableType<P> type) {
-		return this.delegate.setParameterList(name, values, type);
+		this.delegate.setParameterList(name, values, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameterList(String name, Object[] values) {
-		return this.delegate.setParameterList(name, values);
+		this.delegate.setParameterList(name, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(String name, P[] values, Class<P> type) {
-		return this.delegate.setParameterList(name, values, type);
+		this.delegate.setParameterList(name, values, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(String name, P[] values, BindableType<P> type) {
-		return this.delegate.setParameterList(name, values, type);
+		this.delegate.setParameterList(name, values, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameterList(int position, Collection values) {
-		return this.delegate.setParameterList(position, values);
+		this.delegate.setParameterList(position, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(int position, Collection<? extends P> values, Class<P> type) {
-		return this.delegate.setParameterList(position, values, type);
+		this.delegate.setParameterList(position, values, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(int position, Collection<? extends P> values, BindableType<P> javaType) {
-		return this.delegate.setParameterList(position, values, javaType);
+		this.delegate.setParameterList(position, values, javaType);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setParameterList(int position, Object[] values) {
-		return this.delegate.setParameterList(position, values);
+		this.delegate.setParameterList(position, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(int position, P[] values, Class<P> javaType) {
-		return this.delegate.setParameterList(position, values, javaType);
+		this.delegate.setParameterList(position, values, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(int position, P[] values, BindableType<P> javaType) {
-		return this.delegate.setParameterList(position, values, javaType);
+		this.delegate.setParameterList(position, values, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, Collection<? extends P> values) {
-		return this.delegate.setParameterList(parameter, values);
+		this.delegate.setParameterList(parameter, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, Collection<? extends P> values,
 			Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, values, javaType);
+		this.delegate.setParameterList(parameter, values, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, Collection<? extends P> values,
 			BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, values, type);
+		this.delegate.setParameterList(parameter, values, type);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, P[] values) {
-		return this.delegate.setParameterList(parameter, values);
+		this.delegate.setParameterList(parameter, values);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, P[] values, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, values, javaType);
+		this.delegate.setParameterList(parameter, values, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> NativeQuery<T> setParameterList(QueryParameter<P> parameter, P[] values, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, values, type);
+		this.delegate.setParameterList(parameter, values, type);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setProperties(Object bean) {
-		return this.delegate.setProperties(bean);
+		this.delegate.setProperties(bean);
+		return this;
 	}
 
 	@Override
 	public NativeQuery<T> setProperties(Map bean) {
-		return this.delegate.setProperties(bean);
+		this.delegate.setProperties(bean);
+		return this;
 	}
 }

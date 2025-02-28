@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
-@SuppressWarnings("deprecation")
 public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	private final Query<R> delegate;
@@ -106,17 +105,17 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
-		return this.delegate.applyGraph(graph, semantic);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> applyFetchGraph(RootGraph graph) {
-		return this.delegate.applyFetchGraph(graph);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> applyLoadGraph(RootGraph graph) {
-		return this.delegate.applyLoadGraph(graph);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -126,7 +125,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setComment(String comment) {
-		return this.delegate.setComment(comment);
+		this.delegate.setComment(comment);
+		return this;
 	}
 
 	@Override
@@ -136,7 +136,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> addQueryHint(String hint) {
-		return this.delegate.addQueryHint(hint);
+		this.delegate.addQueryHint(hint);
+		return this;
 	}
 
 	@Override
@@ -146,7 +147,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setLockOptions(LockOptions lockOptions) {
-		return this.delegate.setLockOptions(lockOptions);
+		this.delegate.setLockOptions(lockOptions);
+		return this;
 	}
 
 	@Override
@@ -156,12 +158,14 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setLockMode(String alias, LockMode lockMode) {
-		return this.delegate.setLockMode(alias, lockMode);
+		this.delegate.setLockMode(alias, lockMode);
+		return this;
 	}
 
 	@Override
 	public Query<R> setResultListTransformer(ResultListTransformer<R> transformer) {
-		return this.delegate.setResultListTransformer(transformer);
+		this.delegate.setResultListTransformer(transformer);
+		return this;
 	}
 
 	@Override
@@ -176,37 +180,39 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setParameter(String parameter, Object argument) {
-		return this.delegate.setParameter(parameter, argument);
+		this.delegate.setParameter(parameter, argument);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameter(String parameter, Instant argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameter(String parameter, Calendar argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameter(String parameter, Date argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameter(int parameter, Object argument) {
-		return this.delegate.setParameter(parameter, argument);
+		this.delegate.setParameter(parameter, argument);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameter(int parameter, Instant argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameter(int parameter, Date argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -256,42 +262,48 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setParameter(int parameter, Calendar argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameterList(String parameter, Collection arguments) {
-		return this.delegate.setParameterList(parameter, arguments);
+		this.delegate.setParameterList(parameter, arguments);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameterList(String parameter, Object[] values) {
-		return this.delegate.setParameterList(parameter, values);
+		this.delegate.setParameterList(parameter, values);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameterList(int parameter, Collection arguments) {
-		return this.delegate.setParameterList(parameter, arguments);
+		this.delegate.setParameterList(parameter, arguments);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameterList(int parameter, Object[] arguments) {
-		return this.delegate.setParameterList(parameter, arguments);
+		this.delegate.setParameterList(parameter, arguments);
+		return this;
 	}
 
 	@Override
 	public Query<R> setProperties(Object bean) {
-		return this.delegate.setProperties(bean);
+		this.delegate.setProperties(bean);
+		return this;
 	}
 
 	@Override
 	public Query<R> setProperties(Map bean) {
-		return this.delegate.setProperties(bean);
+		this.delegate.setProperties(bean);
+		return this;
 	}
 
 	@Override
 	public Query<R> setHibernateFlushMode(FlushMode flushMode) {
-		return this.delegate.setHibernateFlushMode(flushMode);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -311,17 +323,19 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setQueryFlushMode(QueryFlushMode queryFlushMode) {
-		return this.delegate.setQueryFlushMode(queryFlushMode);
+		this.delegate.setQueryFlushMode(queryFlushMode);
+		return this;
 	}
 
 	@Override
 	public FlushModeType getFlushMode() {
-		return this.delegate.getFlushMode();
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setCacheable(boolean cacheable) {
-		return this.delegate.setCacheable(cacheable);
+		this.delegate.setCacheable(cacheable);
+		return this;
 	}
 
 	@Override
@@ -331,7 +345,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public SelectionQuery<R> setQueryPlanCacheable(boolean queryPlanCacheable) {
-		return this.delegate.setQueryPlanCacheable(queryPlanCacheable);
+		this.delegate.setQueryPlanCacheable(queryPlanCacheable);
+		return this;
 	}
 
 	@Override
@@ -341,27 +356,32 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setCacheRegion(String cacheRegion) {
-		return this.delegate.setCacheRegion(cacheRegion);
+		this.delegate.setCacheRegion(cacheRegion);
+		return this;
 	}
 
 	@Override
 	public Query<R> setCacheMode(CacheMode cacheMode) {
-		return this.delegate.setCacheMode(cacheMode);
+		this.delegate.setCacheMode(cacheMode);
+		return this;
 	}
 
 	@Override
 	public Query<R> setCacheStoreMode(CacheStoreMode cacheStoreMode) {
-		return this.delegate.setCacheStoreMode(cacheStoreMode);
+		this.delegate.setCacheStoreMode(cacheStoreMode);
+		return this;
 	}
 
 	@Override
 	public TypedQuery<R> setTimeout(Integer integer) {
-		return this.delegate.setTimeout(integer);
+		this.delegate.setTimeout(integer);
+		return this;
 	}
 
 	@Override
 	public Query<R> setCacheRetrieveMode(CacheRetrieveMode cacheRetrieveMode) {
-		return this.delegate.setCacheRetrieveMode(cacheRetrieveMode);
+		this.delegate.setCacheRetrieveMode(cacheRetrieveMode);
+		return this;
 	}
 
 	@Override
@@ -371,12 +391,14 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setTimeout(int timeout) {
-		return this.delegate.setTimeout(timeout);
+		this.delegate.setTimeout(timeout);
+		return this;
 	}
 
 	@Override
 	public Query<R> setFetchSize(int fetchSize) {
-		return this.delegate.setFetchSize(fetchSize);
+		this.delegate.setFetchSize(fetchSize);
+		return this;
 	}
 
 	@Override
@@ -386,7 +408,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setReadOnly(boolean readOnly) {
-		return this.delegate.setReadOnly(readOnly);
+		this.delegate.setReadOnly(readOnly);
+		return this;
 	}
 
 	@Override
@@ -396,7 +419,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setMaxResults(int maxResults) {
-		return this.delegate.setMaxResults(maxResults);
+		this.delegate.setMaxResults(maxResults);
+		return this;
 	}
 
 	@Override
@@ -406,12 +430,14 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setFirstResult(int startPosition) {
-		return this.delegate.setFirstResult(startPosition);
+		this.delegate.setFirstResult(startPosition);
+		return this;
 	}
 
 	@Override
 	public Query<R> setPage(Page page) {
-		return this.delegate.setPage(page);
+		this.delegate.setPage(page);
+		return this;
 	}
 
 	@Override
@@ -431,7 +457,8 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setHint(String hintName, Object value) {
-		return this.delegate.setHint(hintName, value);
+		this.delegate.setHint(hintName, value);
+		return this;
 	}
 
 	@Override
@@ -441,37 +468,41 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public Query<R> setEntityGraph(EntityGraph<R> graph, GraphSemantic semantic) {
-		return this.delegate.setEntityGraph(graph, semantic);
+		this.delegate.setEntityGraph(graph, semantic);
+		return this;
 	}
 
 	@Override
 	public Query<R> enableFetchProfile(String profileName) {
-		return this.delegate.enableFetchProfile(profileName);
+		this.delegate.enableFetchProfile(profileName);
+		return this;
 	}
 
 	@Override
 	public Query<R> disableFetchProfile(String profileName) {
-		return this.delegate.disableFetchProfile(profileName);
+		this.delegate.disableFetchProfile(profileName);
+		return this;
 	}
 
 	@Override
 	public Query<R> setFlushMode(FlushModeType flushMode) {
-		return this.delegate.setFlushMode(flushMode);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public FlushMode getHibernateFlushMode() {
-		return this.delegate.getHibernateFlushMode();
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setLockMode(LockModeType lockMode) {
-		return this.delegate.setLockMode(lockMode);
+		this.delegate.setLockMode(lockMode);
+		return this;
 	}
 
 	@Override
 	public <T> Query<T> setResultTransformer(ResultTransformer<T> transformer) {
-		return this.delegate.setResultTransformer(transformer);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
@@ -481,153 +512,181 @@ public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	@Override
 	public SelectionQuery<R> setHibernateLockMode(LockMode lockMode) {
-		return this.delegate.setHibernateLockMode(lockMode);
+		this.delegate.setHibernateLockMode(lockMode);
+		return this;
 	}
 
 	@Override
 	public Query<R> setOrder(Order<? super R> order) {
-		return this.delegate.setOrder(order);
+		this.delegate.setOrder(order);
+		return this;
 	}
 
 	@Override
 	public Query<R> addRestriction(Restriction<? super R> restriction) {
-		return this.delegate.addRestriction(restriction);
+		this.delegate.addRestriction(restriction);
+		return this;
 	}
 
 	@Override
 	public SelectionQuery<R> setFollowOnLocking(boolean enable) {
-		return this.delegate.setFollowOnLocking(enable);
+		this.delegate.setFollowOnLocking(enable);
+		return this;
 	}
 
 	@Override
 	public Query<R> setOrder(List<? extends Order<? super R>> orderList) {
-		return this.delegate.setOrder(orderList);
+		this.delegate.setOrder(orderList);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, P[] arguments, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, P[] arguments, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, P[] arguments) {
-		return this.delegate.setParameterList(parameter, arguments);
+		this.delegate.setParameterList(parameter, arguments);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments,
 			BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments,
 			Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> arguments) {
-		return this.delegate.setParameterList(parameter, arguments);
+		this.delegate.setParameterList(parameter, arguments);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(int parameter, P[] arguments, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(int parameter, P[] arguments, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(int parameter, Collection<? extends P> arguments, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(int parameter, Collection<? extends P> arguments, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(String parameter, P[] arguments, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(String parameter, P[] arguments, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(String parameter, Collection<? extends P> arguments, BindableType<P> type) {
-		return this.delegate.setParameterList(parameter, arguments, type);
+		this.delegate.setParameterList(parameter, arguments, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameterList(String parameter, Collection<? extends P> arguments, Class<P> javaType) {
-		return this.delegate.setParameterList(parameter, arguments, javaType);
+		this.delegate.setParameterList(parameter, arguments, javaType);
+		return this;
 	}
 
 	@Override
 	public Query<R> setParameter(Parameter<Date> parameter, Date argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public Query<R> setParameter(Parameter<Calendar> parameter, Calendar argument, TemporalType temporalType) {
-		return this.delegate.setParameter(parameter, argument, temporalType);
+		throw new UnsupportedOperationException("Deprecated");
 	}
 
 	@Override
 	public <T> Query<R> setParameter(Parameter<T> parameter, T argument) {
-		return this.delegate.setParameter(parameter, argument);
+		this.delegate.setParameter(parameter, argument);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(QueryParameter<P> parameter, P argument, BindableType<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(QueryParameter<P> parameter, P argument, Class<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <T> Query<R> setParameter(QueryParameter<T> parameter, T argument) {
-		return this.delegate.setParameter(parameter, argument);
+		this.delegate.setParameter(parameter, argument);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(int parameter, P argument, BindableType<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(int parameter, P argument, Class<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(String parameter, P argument, BindableType<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <P> Query<R> setParameter(String parameter, P argument, Class<P> type) {
-		return this.delegate.setParameter(parameter, argument, type);
+		this.delegate.setParameter(parameter, argument, type);
+		return this;
 	}
 
 	@Override
 	public <T> Query<T> setTupleTransformer(TupleTransformer<T> transformer) {
-		return this.delegate.setTupleTransformer(transformer);
+		this.delegate.setTupleTransformer(transformer);
+		return (Query<T>) this;
 	}
 }
