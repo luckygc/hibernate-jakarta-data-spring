@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
+@SuppressWarnings({"deprecation", "unchecked"})
 public class NativeQueryProxy<T> extends QueryProxySupport implements NativeQuery<T> {
 
 	private final NativeQuery<T> delegate;

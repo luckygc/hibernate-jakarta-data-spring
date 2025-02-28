@@ -503,7 +503,7 @@ public class StatelessSessionProxyImpl implements StatelessSessionProxy {
 	}
 
 	@Override
-	public Query createNamedQuery(String name) {
+	public Query<?> createNamedQuery(String name) {
 		return execute(session -> session.createNamedQuery(name));
 	}
 

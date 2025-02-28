@@ -12,8 +12,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.lang.NonNullApi;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 import java.util.Set;
 
@@ -34,7 +34,9 @@ public class ClassPathRepositoryScanner extends ClassPathBeanDefinitionScanner {
 
 	@NonNull
 	@Override
-	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+	protected Set<BeanDefinitionHolder> doScan(@NonNull String... basePackages) {
+		Assert.notNull(basePackages, "basePackages must not be null");
+
 		Set<BeanDefinitionHolder> beanDefinitionHolders = super.doScan(basePackages);
 		if (!beanDefinitionHolders.isEmpty()) {
 			processBeanDefinitions(beanDefinitionHolders);

@@ -32,7 +32,7 @@ public class RepositoryScannerConfigurer
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet()  {
 		Assert.notNull(this.basePackage, "Property 'basePackage' is required");
 	}
 

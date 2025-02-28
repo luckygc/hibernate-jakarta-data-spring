@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
+@SuppressWarnings({"deprecation", "unchecked"})
 public class QueryProxy<R> extends QueryProxySupport implements Query<R> {
 
 	private final Query<R> delegate;

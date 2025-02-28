@@ -23,7 +23,7 @@ public class RepositoryScannerRegistry implements ImportBeanDefinitionRegistrar 
 				importingClassMetadata.getAnnotationAttributes(RepositoryScan.class.getName()));
 		if (repositoryScanAttrs != null) {
 			registerBeanDefinitions(importingClassMetadata, repositoryScanAttrs, registry,
-					generateBaseBeanName(importingClassMetadata, 0));
+					generateBaseBeanName(importingClassMetadata));
 		}
 	}
 
@@ -45,9 +45,9 @@ public class RepositoryScannerRegistry implements ImportBeanDefinitionRegistrar 
 		registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
 	}
 
-	private static String generateBaseBeanName(AnnotationMetadata importingClassMetadata, int index) {
+	private static String generateBaseBeanName(AnnotationMetadata importingClassMetadata) {
 		return importingClassMetadata.getClassName() + "#" + RepositoryScannerRegistry.class.getSimpleName() + "#"
-				+ index;
+				+ 0;
 	}
 
 	private static String getDefaultBasePackage(AnnotationMetadata importingClassMetadata) {

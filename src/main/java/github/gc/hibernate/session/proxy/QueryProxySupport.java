@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 public abstract class QueryProxySupport {
 
-	protected StatelessSession session;
+	protected final StatelessSession session;
 
 	public QueryProxySupport(@NonNull StatelessSession session) {
 		Assert.notNull(session, "StatelessSession must not be null");

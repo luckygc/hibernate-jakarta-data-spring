@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class MutationQueryProxy extends QueryProxySupport implements MutationQuery {
 
 	private final MutationQuery delegate;

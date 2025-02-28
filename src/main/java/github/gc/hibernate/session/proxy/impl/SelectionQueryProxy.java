@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
+@SuppressWarnings("deprecation")
 public class SelectionQueryProxy<R> extends QueryProxySupport implements SelectionQuery<R> {
 
 	private final SelectionQuery<R> delegate;
