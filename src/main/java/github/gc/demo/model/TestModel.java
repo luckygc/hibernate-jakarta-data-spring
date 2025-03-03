@@ -7,10 +7,20 @@ import jakarta.persistence.*;
 public class TestModel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	private String name;
+
+	private Integer age;
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
 
 	public Long getId() {
 		return id;
