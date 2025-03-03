@@ -71,11 +71,6 @@ public class SessionFactoryBuilder extends Configuration {
 
 		getProperties().put(AvailableSettings.CLASSLOADERS, Collections.singleton(resourceLoader.getClassLoader()));
 
-		setProperty(AvailableSettings.STATEMENT_FETCH_SIZE, Integer.MAX_VALUE);
-		setProperty(AvailableSettings.DEFAULT_BATCH_FETCH_SIZE, Integer.MAX_VALUE);
-		setProperty(AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY, AccessType.READ_WRITE.getExternalName());
-		setProperty(AvailableSettings.USE_SECOND_LEVEL_CACHE, Boolean.FALSE);
-
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 	}
 
