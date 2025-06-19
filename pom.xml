@@ -19,7 +19,7 @@
         <jspecify.version>1.0.0</jspecify.version>
         <hibernate.version>7.0.0.Beta4</hibernate.version>
         <hibernate-validator.version>9.0.0.CR1</hibernate-validator.version>
-        <spring.version>6.2.3</spring.version>
+        <spring.version>6.2.7</spring.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.5</version>
+            <version>42.7.7</version>
         </dependency>
 
         <dependency>
