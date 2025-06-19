@@ -1,8 +1,17 @@
 package github.gc.jakartadata.repository;
 
 import github.gc.hibernate.session.StatelessSessionUtils;
-import github.gc.hibernate.session.proxy.impl.StatelessSessionProxyImpl;
+import github.gc.hibernate.session.proxy.impl.MutationQueryProxy;
+import github.gc.hibernate.session.proxy.impl.NativeQueryProxy;
+import github.gc.hibernate.session.proxy.impl.QueryProxy;
+import github.gc.hibernate.session.proxy.impl.SelectionQueryProxy;
 import org.hibernate.StatelessSession;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
+import javax.sql.DataSource;
 import org.jspecify.annotations.NonNull;
 import org.springframework.util.Assert;
 
@@ -23,26 +32,19 @@ public final class RepositoryUtils {
 
     @NonNull
     public static <R> R createRepository(@NonNull Class<R> repositoryInterfaceClass,
-                    @NonNull StatelessSession statelessSession) {
+                                         @NonNull SessionFactory sessionFactory,
+                                         @NonNull DataSource dataSource) {
         Assert.notNull(repositoryInterfaceClass, "repositoryInterfaceClass must not be null");
-        Assert.notNull(statelessSession, "statelessSession must not be null");
+        Assert.notNull(sessionFactory, "sessionFactory must not be null");
+        Assert.notNull(dataSource, "dataSource must not be null");
 
         Class<R> repositoryImplClass = getRepositoryImplClass(repositoryInterfaceClass);
 
-        try {
-            Constructor<R> constructor = repositoryImplClass.getConstructor(StatelessSession.class);
-            R target = constructor.newInstance(statelessSession);
+        InvocationHandler repoHandler = new RepositoryInvocationHandler<>(repositoryImplClass,
+                sessionFactory, dataSource);
 
-            StatelessSessionProxyImpl handler =
-                    (StatelessSessionProxyImpl) Proxy.getInvocationHandler(statelessSession);
-
-            InvocationHandler repoHandler = new RepositoryInvocationHandler<>(target, handler);
-
-            return (R) Proxy.newProxyInstance(repositoryInterfaceClass.getClassLoader(),
-                    new Class<?>[]{repositoryInterfaceClass}, repoHandler);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return (R) Proxy.newProxyInstance(repositoryInterfaceClass.getClassLoader(),
+                new Class<?>[]{repositoryInterfaceClass}, repoHandler);
     }
 
 	public static <R, I extends R> Class<I> getRepositoryImplClass(@NonNull Class<R> repositoryInterface) {
@@ -63,35 +65,58 @@ public final class RepositoryUtils {
                 }
         }
 
-        private static class RepositoryInvocationHandler<T> implements InvocationHandler {
-                private final T target;
-                private final StatelessSessionProxyImpl sessionHandler;
+        private static class RepositoryInvocationHandler<R> implements InvocationHandler {
+                private final Class<R> implClass;
+                private final SessionFactory sessionFactory;
+                private final DataSource dataSource;
+                private final Constructor<R> constructor;
 
-                RepositoryInvocationHandler(T target, StatelessSessionProxyImpl sessionHandler) {
-                        this.target = target;
-                        this.sessionHandler = sessionHandler;
+                RepositoryInvocationHandler(Class<R> implClass, SessionFactory sessionFactory, DataSource dataSource) {
+                        this.implClass = implClass;
+                        this.sessionFactory = sessionFactory;
+                        this.dataSource = dataSource;
+                        try {
+                                this.constructor = implClass.getConstructor(StatelessSession.class);
+                        } catch (NoSuchMethodException e) {
+                                throw new IllegalStateException("No constructor found taking StatelessSession", e);
+                        }
                 }
 
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        var sf = sessionHandler.getSessionFactory();
-                        var ds = sessionHandler.getDataSource();
-                        StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sf, ds);
+                        StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
+                        boolean transactional = session != null;
                         boolean isNew = false;
                         if (session == null) {
-                                session = sf.openStatelessSession();
+                                session = sessionFactory.openStatelessSession();
                                 isNew = true;
                         }
 
-                        sessionHandler.bind(session);
+                        R target = constructor.newInstance(session);
+                        Object result;
                         try {
-                                return method.invoke(target, args);
+                                result = method.invoke(target, args);
                         } finally {
-                                sessionHandler.unbind();
-                                if (isNew) {
+                                if (isNew && !(method.getReturnType().isAssignableFrom(StatelessSession.class)
+                                        || Query.class.isAssignableFrom(method.getReturnType()))) {
                                         StatelessSessionUtils.closeStatelessSession(session);
                                 }
                         }
+
+                        if (isNew && Query.class.isAssignableFrom(method.getReturnType()) && result instanceof Query<?> q) {
+                                return new QueryProxy<>(q, session).getProxy();
+                        }
+                        if (isNew && SelectionQuery.class.isAssignableFrom(method.getReturnType()) && result instanceof SelectionQuery<?> sq) {
+                                return new SelectionQueryProxy<>(sq, session).getProxy();
+                        }
+                        if (isNew && MutationQuery.class.isAssignableFrom(method.getReturnType()) && result instanceof MutationQuery mq) {
+                                return new MutationQueryProxy(mq, session).getProxy();
+                        }
+                        if (isNew && NativeQuery.class.isAssignableFrom(method.getReturnType()) && result instanceof NativeQuery<?> nq) {
+                                return new NativeQueryProxy<>(nq, session).getProxy();
+                        }
+                        // if returns session and we created it, don't close; caller is responsible
+                        return result;
                 }
         }
 }

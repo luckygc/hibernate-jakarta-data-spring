@@ -5,7 +5,7 @@ spring集成jakarta data,底层基于hibernate
 
 暂时不支持多数据源，只支持本地事务，自动参与spring事务。使用DatasourceTransactionManager即可管理事务
 
-使用repository或者session代理对象，有spring事务情况下，由事务同步关闭session，事务管理器关闭连接。无事务情况下执行完操作就关闭session，session会关闭连接。
+repository方法通过代理管理StatelessSession，有事务时由事务同步关闭session，无事务则在方法结束后立即关闭，返回Query时会延迟关闭。
 
 
 ```java
@@ -26,10 +26,6 @@ public class DataConfiguration {
 		return sessionFactoryBean.getObject();
 	}
 
-        @Bean
-        public StatelessSession statelessSession(SessionFactory sessionFactory) {
-                return new StatelessSessionProxyImpl(sessionFactory).getProxy();
-        }
 }
 ```
 

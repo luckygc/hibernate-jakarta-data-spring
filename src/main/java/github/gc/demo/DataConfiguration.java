@@ -1,8 +1,6 @@
 package github.gc.demo;
 
 import github.gc.hibernate.factory.SessionFactoryBean;
-import github.gc.hibernate.session.proxy.impl.StatelessSessionProxyImpl;
-import org.hibernate.StatelessSession;
 import github.gc.jakartadata.annotation.RepositoryScan;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.access.AccessType;
@@ -35,9 +33,4 @@ public class DataConfiguration {
 
 		return sessionFactoryBean.getObject();
 	}
-
-        @Bean
-        public StatelessSession statelessSession(SessionFactory sessionFactory) {
-                return new StatelessSessionProxyImpl(sessionFactory).getProxy();
-        }
 }
