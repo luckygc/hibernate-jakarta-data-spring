@@ -27,7 +27,7 @@ public class DataConfiguration {
 	}
 
         @Bean
-        public StatelessSessionProxy statelessSessionProxy(SessionFactory sessionFactory) {
+        public StatelessSession statelessSession(SessionFactory sessionFactory) {
                 return new StatelessSessionProxyImpl(sessionFactory).getProxy();
         }
 }

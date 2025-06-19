@@ -39,7 +39,7 @@ public class StatelessSessionProxyImpl implements InvocationHandler {
                 new Class<?>[]{StatelessSessionProxy.class}, this);
     }
 
-    public StatelessSessionProxy getProxy() {
+    public StatelessSession getProxy() {
         return this.proxy;
     }
 
