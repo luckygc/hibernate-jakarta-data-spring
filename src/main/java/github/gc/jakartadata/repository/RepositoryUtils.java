@@ -1,8 +1,7 @@
 package github.gc.jakartadata.repository;
 
-import github.gc.hibernate.session.proxy.StatelessSessionProxy;
-import github.gc.hibernate.session.proxy.impl.StatelessSessionProxyImpl;
 import github.gc.hibernate.session.StatelessSessionUtils;
+import github.gc.hibernate.session.proxy.impl.StatelessSessionProxyImpl;
 import org.hibernate.StatelessSession;
 import org.jspecify.annotations.NonNull;
 import org.springframework.util.Assert;
@@ -24,18 +23,18 @@ public final class RepositoryUtils {
 
     @NonNull
     public static <R> R createRepository(@NonNull Class<R> repositoryInterfaceClass,
-                    @NonNull StatelessSessionProxy sessionProxy) {
+                    @NonNull StatelessSession statelessSession) {
         Assert.notNull(repositoryInterfaceClass, "repositoryInterfaceClass must not be null");
-        Assert.notNull(sessionProxy, "sessionProxy must not be null");
+        Assert.notNull(statelessSession, "statelessSession must not be null");
 
         Class<R> repositoryImplClass = getRepositoryImplClass(repositoryInterfaceClass);
 
         try {
             Constructor<R> constructor = repositoryImplClass.getConstructor(StatelessSession.class);
-            R target = constructor.newInstance(sessionProxy);
+            R target = constructor.newInstance(statelessSession);
 
             StatelessSessionProxyImpl handler =
-                    (StatelessSessionProxyImpl) Proxy.getInvocationHandler(sessionProxy);
+                    (StatelessSessionProxyImpl) Proxy.getInvocationHandler(statelessSession);
 
             InvocationHandler repoHandler = new RepositoryInvocationHandler<>(target, handler);
 
