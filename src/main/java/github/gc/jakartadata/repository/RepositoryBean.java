@@ -1,6 +1,7 @@
 package github.gc.jakartadata.repository;
 
-import github.gc.hibernate.session.proxy.StatelessSessionProxy;
+import org.hibernate.SessionFactory;
+import javax.sql.DataSource;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,11 @@ public class RepositoryBean<T> extends DaoSupport implements FactoryBean<T> {
 
 	private final Class<T> repositoryInterface;
 
-	@Autowired
-	private StatelessSessionProxy sessionProxy;
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @Autowired
+    private DataSource dataSource;
 
 	public RepositoryBean(@NonNull Class<T> repositoryInterface) {
 		this.repositoryInterface = repositoryInterface;
@@ -20,7 +24,7 @@ public class RepositoryBean<T> extends DaoSupport implements FactoryBean<T> {
 
 	@Override
 	public T getObject() {
-		return RepositoryUtils.createRepository(this.repositoryInterface, this.sessionProxy);
+        return RepositoryUtils.createRepository(this.repositoryInterface, this.sessionFactory, this.dataSource);
 	}
 
 	@Override
@@ -36,7 +40,8 @@ public class RepositoryBean<T> extends DaoSupport implements FactoryBean<T> {
 	@Override
 	protected void checkDaoConfig() throws IllegalArgumentException {
 		Assert.notNull(this.repositoryInterface, "Property 'repositoryInterface' is required");
-		Assert.notNull(this.sessionProxy, "Property 'sessionProxy' is required");
+        Assert.notNull(this.sessionFactory, "Property 'sessionFactory' is required");
+        Assert.notNull(this.dataSource, "Property 'dataSource' is required");
 
 		Class<? extends T> ignore = RepositoryUtils.getRepositoryImplClass(repositoryInterface);
 	}
@@ -45,11 +50,19 @@ public class RepositoryBean<T> extends DaoSupport implements FactoryBean<T> {
 		return repositoryInterface;
 	}
 
-	public StatelessSessionProxy getSessionProxy() {
-		return sessionProxy;
-	}
+        public SessionFactory getSessionFactory() {
+                return sessionFactory;
+        }
 
-	public void setSessionProxy(@NonNull StatelessSessionProxy sessionProxy) {
-		this.sessionProxy = sessionProxy;
-	}
+        public void setSessionFactory(@NonNull SessionFactory sessionFactory) {
+                this.sessionFactory = sessionFactory;
+        }
+
+        public DataSource getDataSource() {
+                return dataSource;
+        }
+
+        public void setDataSource(@NonNull DataSource dataSource) {
+                this.dataSource = dataSource;
+        }
 }
