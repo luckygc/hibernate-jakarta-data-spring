@@ -22,7 +22,7 @@ public interface TestRepository extends CrudRepository<TestModel, Long> {
 	@OrderBy(_TestModel.ID)
 	List<TestModel> byIdRange(Range<Long> id);
 
-	record ByNameDto(Long primaryId,String modelMame){}
+        record ByNameDto(Long primaryId, String modelName){}
 
 	@Query(" select id, name from TestModel order by id asc ")
 	List<ByNameDto> dTobyName();
