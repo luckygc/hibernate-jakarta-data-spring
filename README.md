@@ -26,10 +26,10 @@ public class DataConfiguration {
 		return sessionFactoryBean.getObject();
 	}
 
-	@Bean
-	public StatelessSessionProxy statelessSessionProxy(SessionFactory sessionFactory) {
-		return new StatelessSessionProxyImpl(sessionFactory);
-	}
+        @Bean
+        public StatelessSessionProxy statelessSessionProxy(SessionFactory sessionFactory) {
+                return new StatelessSessionProxyImpl(sessionFactory).getProxy();
+        }
 }
 ```
 
