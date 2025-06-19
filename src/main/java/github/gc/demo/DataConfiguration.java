@@ -22,7 +22,7 @@ public class DataConfiguration {
 	public SessionFactory sessionFactory(DataSource dataSource) {
 		SessionFactoryBean sessionFactoryBean = new SessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
-		sessionFactoryBean.setPackagesToScanEntity(new String[]{"github.gc.**.model"});
+                sessionFactoryBean.setPackagesToScan(new String[]{"github.gc.**.model"});
 		Properties properties = sessionFactoryBean.getHibernateProperties();
 		properties.put(AvailableSettings.SHOW_SQL, Boolean.FALSE);
 		properties.put(AvailableSettings.FORMAT_SQL, Boolean.TRUE);
