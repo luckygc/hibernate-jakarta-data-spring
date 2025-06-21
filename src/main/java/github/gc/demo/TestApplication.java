@@ -1,8 +1,13 @@
 package github.gc.demo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import github.gc.demo.model.TestModel;
 import github.gc.demo.model.TestModel_;
+import github.gc.demo.model._TestModel;
 import github.gc.demo.repository.TestRepository;
+import jakarta.data.Order;
+import jakarta.data.page.Page;
+import jakarta.data.page.PageRequest;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.cfg.AvailableSettings;
@@ -38,6 +43,9 @@ public class TestApplication {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	public static void main(String[] args) {
 		SpringApplication.run(TestApplication.class, args);
 	}
@@ -61,41 +69,41 @@ public class TestApplication {
 		//			System.out.println(resultList);
 		//		});
 
-		transactionTemplate.executeWithoutResult(status -> {
-			SelectionQuery<TestModel> testModelSelectionQuery = testRepository.selectionQuery();
-			testModelSelectionQuery.setFetchSize(100);
-			testModelSelectionQuery.setComment("我是测试注释");
-			List<TestModel> resultList = testModelSelectionQuery.getResultList();
-			System.out.println(resultList);
+		//		transactionTemplate.executeWithoutResult(status -> {
+		//			SelectionQuery<TestModel> testModelSelectionQuery = testRepository.selectionQuery();
+		//			testModelSelectionQuery.setFetchSize(100);
+		//			testModelSelectionQuery.setComment("我是测试注释");
+		//			List<TestModel> resultList = testModelSelectionQuery.getResultList();
+		//			System.out.println(resultList);
+		//
+		//			List<TestModel> test2 = testRepository.byIdRange(Range.greaterThan(0L));
+		//			System.out.println(test2);
+		//
+		//			List<TestModel> test3 = testRepository.byIdRange(Range.singleValue(1L));
+		//			System.out.println(test3);
+		//
+		//			List<TestRepository.ByNameDto> byNameDtos = testRepository.dTobyName();
+		//			System.out.println(byNameDtos);
+		//		});
+		//
+		//		StopWatch stopWatch = new StopWatch();
+		//		stopWatch.start();
+		//		transactionTemplate.executeWithoutResult(status -> {
+		//			List<TestModel> testModels = new ArrayList<>(200000);
+		//			for (long i = 0; i < 100000; i++) {
+		//				TestModel testModel = new TestModel();
+		//				testModel.setId(  i);
+		//				testModel.setName("testInsert" + i);
+		//				testModels.add(testModel);
+		//			}
+		//
+		//			testRepository.insertAll(testModels);
+		//		});
+		//		stopWatch.stop();
+		//		System.out.println(stopWatch.getTotalTimeSeconds());
 
-			List<TestModel> test = testRepository.byName(Range.prefix("tes"));
-			System.out.println(test);
-
-			List<TestModel> test2 = testRepository.byIdRange(Range.greaterThan(0L));
-			System.out.println(test2);
-
-			List<TestModel> test3 = testRepository.byIdRange(Range.singleValue(1L));
-			System.out.println(test3);
-
-			List<TestRepository.ByNameDto> byNameDtos = testRepository.dTobyName();
-			System.out.println(byNameDtos);
-		});
-
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		transactionTemplate.executeWithoutResult(status -> {
-			List<TestModel> testModels = new ArrayList<>(200000);
-			for (long i = 0; i < 100000; i++) {
-				TestModel testModel = new TestModel();
-				testModel.setId(  i);
-				testModel.setName("testInsert" + i);
-				testModels.add(testModel);
-			}
-
-			testRepository.insertAll(testModels);
-		});
-		stopWatch.stop();
-		System.out.println(stopWatch.getTotalTimeSeconds());
+		Page<TestModel> all = testRepository.findAll(PageRequest.ofPage(1, 10, false), Order.by(_TestModel.id.asc()));
+		objectMapper.writeValueAsString(all);
 		return "test";
 	}
 }

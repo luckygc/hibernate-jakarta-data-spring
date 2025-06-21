@@ -17,8 +17,8 @@
         <jakarta.data.version>1.0.1</jakarta.data.version>
         <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
         <jspecify.version>1.0.0</jspecify.version>
-        <hibernate.version>7.0.0.Beta4</hibernate.version>
-        <hibernate-validator.version>9.0.0.CR1</hibernate-validator.version>
+        <hibernate.version>7.0.0.Final</hibernate.version>
+        <hibernate-validator.version>9.0.0.Final</hibernate-validator.version>
         <spring.version>6.2.7</spring.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
@@ -58,6 +58,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.19</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -72,6 +78,12 @@
             <artifactId>spring-tx</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mybatis.dynamic-sql</groupId>
+            <artifactId>mybatis-dynamic-sql</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.slf4j</groupId>

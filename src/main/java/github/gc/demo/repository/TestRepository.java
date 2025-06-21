@@ -3,7 +3,6 @@ package github.gc.demo.repository;
 import github.gc.demo.model.TestModel;
 import github.gc.demo.model._TestModel;
 import jakarta.data.repository.*;
-import org.hibernate.annotations.OptimisticLock;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.range.Range;
 
@@ -16,7 +15,10 @@ public interface TestRepository extends CrudRepository<TestModel, Long> {
 	SelectionQuery<TestModel> selectionQuery();
 
 	@Find
-	List<TestModel> byName(Range<String> name);
+	List<TestModel> byName(String name);
+
+	@Find
+	List<TestModel> byName2(String name);
 
 	@Find
 	@OrderBy(_TestModel.ID)
