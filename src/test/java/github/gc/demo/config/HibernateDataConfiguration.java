@@ -50,12 +50,16 @@ public class HibernateDataConfiguration {
         properties.setProperty(AvailableSettings.SHOW_SQL, "true");
         properties.setProperty(AvailableSettings.FORMAT_SQL, "true");
         properties.setProperty(AvailableSettings.USE_SQL_COMMENTS, "true");
-        
-        // 连接池配置
-        properties.setProperty(AvailableSettings.CONNECTION_PROVIDER, 
-            "org.hibernate.hikaricp.internal.HikariCPConnectionProvider");
-        properties.setProperty("hibernate.hikari.maximumPoolSize", "20");
-        properties.setProperty("hibernate.hikari.minimumIdle", "5");
+
+        // 数据源配置
+        properties.setProperty(AvailableSettings.URL, "jdbc:postgresql://localhost:5432/test");
+        properties.setProperty(AvailableSettings.USER, "test");
+        properties.setProperty(AvailableSettings.PASS, "test");
+        properties.setProperty(AvailableSettings.DRIVER, "org.postgresql.Driver");
+
+        // 连接池配置 - 使用简单的连接池
+        properties.setProperty(AvailableSettings.CONNECTION_PROVIDER,
+            "org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl");
         
         // 性能优化
         properties.setProperty(AvailableSettings.STATEMENT_BATCH_SIZE, "25");

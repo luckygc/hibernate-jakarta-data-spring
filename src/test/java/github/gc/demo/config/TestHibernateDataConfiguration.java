@@ -54,11 +54,12 @@ public class TestHibernateDataConfiguration {
         properties.setProperty(AvailableSettings.FORMAT_SQL, "true");
         properties.setProperty(AvailableSettings.USE_SQL_COMMENTS, "true");
 
-        // 数据源配置
+        // 数据源配置 - 使用简单的连接池
         properties.setProperty(AvailableSettings.URL, "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
         properties.setProperty(AvailableSettings.USER, "sa");
         properties.setProperty(AvailableSettings.PASS, "");
         properties.setProperty(AvailableSettings.DRIVER, "org.h2.Driver");
+        properties.setProperty(AvailableSettings.CONNECTION_PROVIDER, "org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl");
 
         // 测试环境优化
         properties.setProperty(AvailableSettings.STATEMENT_BATCH_SIZE, "10");

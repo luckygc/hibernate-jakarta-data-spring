@@ -35,13 +35,9 @@ public class JakartaDataRepositoryConfigurationExtension implements ImportBeanDe
         // 创建并配置 Repository Bean 定义注册器
         JakartaDataRepositoryBeanDefinitionRegistrar registrar =
             new JakartaDataRepositoryBeanDefinitionRegistrar();
-        
+
         registrar.setBasePackages(basePackages);
-        registrar.setRepositoryImplementationSuffix(
-            attributes.getString("repositoryImplementationPostfix"));
-        registrar.setConsiderNestedRepositories(
-            attributes.getBoolean("considerNestedRepositories"));
-        
+
         // 注册 Repository Bean 定义
         registrar.registerBeanDefinitions(importingClassMetadata, registry);
     }
@@ -59,11 +55,7 @@ public class JakartaDataRepositoryConfigurationExtension implements ImportBeanDe
             basePackages.addAll(Arrays.asList(packages));
         }
         
-        // 从 basePackageClasses 属性获取
-        Class<?>[] packageClasses = attributes.getClassArray("basePackageClasses");
-        for (Class<?> packageClass : packageClasses) {
-            basePackages.add(packageClass.getPackage().getName());
-        }
+        // 注意：当前注解中没有 basePackageClasses 属性，如果需要可以添加
         
         // 如果没有指定包路径，使用配置类所在的包
         if (basePackages.isEmpty()) {

@@ -1,66 +1,50 @@
 package github.gc.jakartadata.factory;
 
-import github.gc.jakartadata.proxy.HibernateDataRepositoryProxyFactory;
+import github.gc.jakartadata.session.StatelessSessionTemplate;
+import github.gc.jakartadata.utils.HibernateRepositoryUtils;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 import javax.sql.DataSource;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * Hibernate Data Repository 工厂 Bean
- * 负责创建 Repository 接口的代理实例
+ * 参考 MyBatis MapperFactoryBean 的简洁设计
  */
-public class HibernateDataRepositoryFactoryBean<T> implements FactoryBean<T>, InitializingBean {
+public class HibernateDataRepositoryFactoryBean<T> implements FactoryBean<T> {
 
     private static final Logger log = LoggerFactory.getLogger(HibernateDataRepositoryFactoryBean.class);
 
     private final Class<T> repositoryInterface;
-    
+
     @Autowired
     private SessionFactory sessionFactory;
-    
+
     @Autowired
     private DataSource dataSource;
-    
-    private HibernateDataRepositoryProxyFactory<T> proxyFactory;
 
     public HibernateDataRepositoryFactoryBean(@NonNull Class<T> repositoryInterface) {
         this.repositoryInterface = repositoryInterface;
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (sessionFactory == null) {
-            throw new IllegalStateException("SessionFactory is required for HibernateDataRepositoryFactoryBean");
-        }
-        
-        if (dataSource == null) {
-            throw new IllegalStateException("DataSource is required for HibernateDataRepositoryFactoryBean");
-        }
-        
-        this.proxyFactory = new HibernateDataRepositoryProxyFactory<>(
-            repositoryInterface, sessionFactory, dataSource);
-        
-        log.debug("Initialized HibernateDataRepositoryFactoryBean for interface: {}", 
-                 repositoryInterface.getName());
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     public T getObject() throws Exception {
-        if (proxyFactory == null) {
-            throw new IllegalStateException("ProxyFactory not initialized. Call afterPropertiesSet() first.");
-        }
-        
-        T repository = proxyFactory.createRepository();
-        
-        log.debug("Created repository instance for interface: {}", repositoryInterface.getName());
-        
-        return repository;
+        // 参考 MyBatis MapperFactoryBean，直接在 getObject 中创建代理
+        StatelessSessionTemplate sessionTemplate = new StatelessSessionTemplate(sessionFactory, dataSource);
+
+        return (T) Proxy.newProxyInstance(
+            repositoryInterface.getClassLoader(),
+            new Class<?>[]{repositoryInterface},
+            new RepositoryInvocationHandler(sessionTemplate)
+        );
     }
 
     @Override
@@ -73,24 +57,64 @@ public class HibernateDataRepositoryFactoryBean<T> implements FactoryBean<T>, In
         return true;
     }
 
-    // Getters for testing or manual configuration
-    public Class<T> getRepositoryInterface() {
-        return repositoryInterface;
+    /**
+     * Repository 调用处理器
+     * 参考 MyBatis 的简洁代理实现
+     */
+    private class RepositoryInvocationHandler implements InvocationHandler {
+
+        private final StatelessSessionTemplate sessionTemplate;
+
+        public RepositoryInvocationHandler(StatelessSessionTemplate sessionTemplate) {
+            this.sessionTemplate = sessionTemplate;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            // 处理 Object 类的方法
+            if (Object.class.equals(method.getDeclaringClass())) {
+                return handleObjectMethod(proxy, method, args);
+            }
+
+            // 使用 SessionTemplate 执行方法
+            return sessionTemplate.execute(session -> {
+                try {
+                    // 获取 Hibernate 生成的实现类
+                    Class<? extends T> implClass = HibernateRepositoryUtils
+                        .getRepositoryImplementationClass(repositoryInterface);
+
+                    // 创建实现实例并调用方法
+                    T impl = implClass.getDeclaredConstructor(session.getClass()).newInstance(session);
+                    return method.invoke(impl, args);
+
+                } catch (Exception e) {
+                    log.error("Error executing repository method: {}.{}",
+                             repositoryInterface.getSimpleName(), method.getName(), e);
+                    throw new RuntimeException("Repository method execution failed", e);
+                }
+            });
+        }
+
+        private Object handleObjectMethod(Object proxy, Method method, Object[] args) {
+            String methodName = method.getName();
+            switch (methodName) {
+                case "equals":
+                    return proxy == args[0];
+                case "hashCode":
+                    return System.identityHashCode(proxy);
+                case "toString":
+                    return repositoryInterface.getName() + " proxy";
+                default:
+                    throw new UnsupportedOperationException("Method not supported: " + methodName);
+            }
+        }
     }
 
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-    
-    // Setters for manual configuration (if needed)
+    // Setters for manual configuration
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    
+
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
