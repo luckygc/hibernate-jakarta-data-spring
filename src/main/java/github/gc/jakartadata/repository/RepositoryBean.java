@@ -24,7 +24,9 @@ public class RepositoryBean<T> extends DaoSupport implements FactoryBean<T> {
 
 	@Override
 	public T getObject() {
-        return RepositoryUtils.createRepository(this.repositoryInterface, this.sessionFactory, this.dataSource);
+        RepositoryProxyFactory<T> proxyFactory = new RepositoryProxyFactory<>(
+                this.repositoryInterface, this.sessionFactory, this.dataSource);
+        return proxyFactory.newInstance();
 	}
 
 	@Override
