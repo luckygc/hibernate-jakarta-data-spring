@@ -13,12 +13,12 @@ import org.springframework.util.Assert;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-public final class StatelessSessionUtils {
+public final class HibernateStatelessSessionUtils {
 
-	private StatelessSessionUtils() {
+	private HibernateStatelessSessionUtils() {
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(StatelessSessionUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(HibernateStatelessSessionUtils.class);
 
 	@Nullable
 	public static StatelessSession doGetTransactionalStatelessSession(@NonNull SessionFactory sessionFactory,
@@ -26,7 +26,7 @@ public final class StatelessSessionUtils {
 		Assert.notNull(sessionFactory, "No SessionFactory specified");
 		Assert.notNull(dataSource, "No DataSource specified");
 
-		var sessionHolder = (StatelessSessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+		var sessionHolder = (HibernateStatelessSessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
 
 		if (sessionHolder != null) {
 			sessionHolder.requested();
@@ -40,8 +40,8 @@ public final class StatelessSessionUtils {
 		StatelessSession ss = sessionFactory.openStatelessSession(connection);
 
 		try {
-			sessionHolder = new StatelessSessionHolder(ss);
-			var sessionSynchronization = new StatelessSessionSynchronization(sessionHolder, sessionFactory);
+			sessionHolder = new HibernateStatelessSessionHolder(ss);
+			var sessionSynchronization = new HibernateStatelessSessionSynchronization(sessionHolder, sessionFactory);
 			TransactionSynchronizationManager.registerSynchronization(sessionSynchronization);
 			sessionHolder.setSynchronizedWithTransaction(true);
 

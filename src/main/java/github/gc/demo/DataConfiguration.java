@@ -1,6 +1,6 @@
 package github.gc.demo;
 
-import github.gc.hibernate.factory.SessionFactoryBean;
+import github.gc.hibernate.factory.HibernateSessionFactoryBean;
 import github.gc.jakartadata.annotation.RepositoryScan;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.access.AccessType;
@@ -18,7 +18,7 @@ public class DataConfiguration {
 
 	@Bean
 	public SessionFactory sessionFactory(DataSource dataSource) {
-		SessionFactoryBean sessionFactoryBean = new SessionFactoryBean();
+		HibernateSessionFactoryBean sessionFactoryBean = new HibernateSessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
                 sessionFactoryBean.setPackagesToScan(new String[]{"github.gc.**.model"});
 		Properties properties = sessionFactoryBean.getHibernateProperties();

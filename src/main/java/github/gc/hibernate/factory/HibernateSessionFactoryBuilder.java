@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SessionFactoryBuilder extends Configuration {
+public class HibernateSessionFactoryBuilder extends Configuration {
 
 	private static final String RESOURCE_PATTERN = "/**/*.class";
 
@@ -44,20 +44,20 @@ public class SessionFactoryBuilder extends Configuration {
 
 	private final ResourcePatternResolver resourcePatternResolver;
 
-	public SessionFactoryBuilder(DataSource dataSource) {
+	public HibernateSessionFactoryBuilder(DataSource dataSource) {
 		this(dataSource, new PathMatchingResourcePatternResolver());
 	}
 
-	public SessionFactoryBuilder(DataSource dataSource, ClassLoader classLoader) {
+	public HibernateSessionFactoryBuilder(DataSource dataSource, ClassLoader classLoader) {
 		this(dataSource, new PathMatchingResourcePatternResolver(classLoader));
 	}
 
-	public SessionFactoryBuilder(DataSource dataSource, ResourceLoader resourceLoader) {
+	public HibernateSessionFactoryBuilder(DataSource dataSource, ResourceLoader resourceLoader) {
 		this(dataSource, resourceLoader, new MetadataSources(
 				new BootstrapServiceRegistryBuilder().applyClassLoader(resourceLoader.getClassLoader()).build()));
 	}
 
-	public SessionFactoryBuilder(DataSource dataSource, ResourceLoader resourceLoader,
+	public HibernateSessionFactoryBuilder(DataSource dataSource, ResourceLoader resourceLoader,
 			MetadataSources metadataSources) {
 
 		super(metadataSources);
@@ -75,7 +75,7 @@ public class SessionFactoryBuilder extends Configuration {
 	}
 
 	@SuppressWarnings("unchecked")
-	public SessionFactoryBuilder scanPackages(String... packagesToScan) throws HibernateException {
+	public HibernateSessionFactoryBuilder scanPackages(String... packagesToScan) throws HibernateException {
 		Set<String> entityClassNames = new TreeSet<>();
 		Set<String> converterClassNames = new TreeSet<>();
 		try {

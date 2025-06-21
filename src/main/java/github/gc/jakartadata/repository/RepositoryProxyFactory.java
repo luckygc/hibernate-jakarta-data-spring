@@ -1,6 +1,6 @@
 package github.gc.jakartadata.repository;
 
-import github.gc.hibernate.session.StatelessSessionUtils;
+import github.gc.hibernate.session.HibernateStatelessSessionUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.query.MutationQuery;
@@ -86,7 +86,7 @@ public class RepositoryProxyFactory<T> {
             }
 
             // 获取StatelessSession
-            StatelessSession session = StatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
+            StatelessSession session = HibernateStatelessSessionUtils.doGetTransactionalStatelessSession(sessionFactory, dataSource);
             boolean isNewSession = false;
 
             if (session == null) {
@@ -123,7 +123,7 @@ public class RepositoryProxyFactory<T> {
             } finally {
                 // 只有在非Query返回值且是新Session时才立即关闭
                 if (isNewSession && !isQueryType(method.getReturnType())) {
-                    StatelessSessionUtils.closeStatelessSession(session);
+                    HibernateStatelessSessionUtils.closeStatelessSession(session);
                     if (log.isDebugEnabled()) {
                         log.debug("Closed StatelessSession for repository method: {}.{}",
                                  repositoryInterface.getSimpleName(), method.getName());
@@ -280,7 +280,7 @@ public class RepositoryProxyFactory<T> {
         private void closeSessionIfNeeded() {
             if (!sessionClosed && !TransactionSynchronizationManager.isSynchronizationActive()) {
                 // 只有在非事务环境下才关闭Session
-                StatelessSessionUtils.closeStatelessSession(session);
+                HibernateStatelessSessionUtils.closeStatelessSession(session);
                 sessionClosed = true;
                 if (log.isDebugEnabled()) {
                     log.debug("Closed StatelessSession after query execution in non-transactional context");

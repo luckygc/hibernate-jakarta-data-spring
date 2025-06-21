@@ -7,10 +7,10 @@ import org.springframework.core.Ordered;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.ResourceHolderSynchronization;
 
-public class StatelessSessionSynchronization
-		extends ResourceHolderSynchronization<StatelessSessionHolder, SessionFactory> implements Ordered {
+public class HibernateStatelessSessionSynchronization
+		extends ResourceHolderSynchronization<HibernateStatelessSessionHolder, SessionFactory> implements Ordered {
 
-	public StatelessSessionSynchronization(StatelessSessionHolder resourceHolder, SessionFactory resourceKey) {
+	public HibernateStatelessSessionSynchronization(HibernateStatelessSessionHolder resourceHolder, SessionFactory resourceKey) {
 		super(resourceHolder, resourceKey);
 	}
 
@@ -20,8 +20,8 @@ public class StatelessSessionSynchronization
 	}
 
 	@Override
-	protected void releaseResource(@NonNull StatelessSessionHolder resourceHolder,
+	protected void releaseResource(@NonNull HibernateStatelessSessionHolder resourceHolder,
 			@Nullable SessionFactory resourceKey) {
-		StatelessSessionUtils.closeStatelessSession(resourceHolder.getStatelessSession());
+		HibernateStatelessSessionUtils.closeStatelessSession(resourceHolder.getStatelessSession());
 	}
 }
