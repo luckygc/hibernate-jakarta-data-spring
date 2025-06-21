@@ -1,39 +1,33 @@
 package github.gc.demo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import github.gc.demo.config.HibernateDataConfiguration;
 import github.gc.demo.model.TestModel;
-import github.gc.demo.model.TestModel_;
 import github.gc.demo.model._TestModel;
 import github.gc.demo.repository.TestRepository;
 import jakarta.data.Order;
 import jakarta.data.page.Page;
 import jakarta.data.page.PageRequest;
 import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.range.Range;
-import org.hibernate.query.restriction.Restriction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
 @RestController
 @RequestMapping("/")
+@Import(HibernateDataConfiguration.class)
 public class TestApplication {
 
 	@Autowired
