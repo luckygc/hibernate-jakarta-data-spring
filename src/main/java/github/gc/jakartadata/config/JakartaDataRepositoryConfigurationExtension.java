@@ -1,30 +1,29 @@
 package github.gc.jakartadata.config;
 
-import github.gc.jakartadata.annotation.EnableHibernateDataRepositories;
-import github.gc.jakartadata.registry.HibernateDataRepositoryBeanDefinitionRegistrar;
+import github.gc.jakartadata.annotation.EnableJakartaDataRepositories;
+import github.gc.jakartadata.registry.JakartaDataRepositoryBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.lang.NonNull;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Hibernate Data Repository 配置扩展
- * 负责解析 @EnableHibernateDataRepositories 注解并注册相应的 Bean 定义
+ * jakarta Data Repository 配置扩展
+ * 负责解析 @EnableJakartaDataRepositories 注解并注册相应的 Bean 定义
  */
-public class HibernateDataRepositoryConfigurationExtension implements ImportBeanDefinitionRegistrar {
+public class JakartaDataRepositoryConfigurationExtension implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata, 
                                       @NonNull BeanDefinitionRegistry registry) {
         
         AnnotationAttributes attributes = AnnotationAttributes.fromMap(
-            importingClassMetadata.getAnnotationAttributes(EnableHibernateDataRepositories.class.getName()));
+            importingClassMetadata.getAnnotationAttributes(EnableJakartaDataRepositories.class.getName()));
         
         if (attributes == null) {
             return;
@@ -34,11 +33,11 @@ public class HibernateDataRepositoryConfigurationExtension implements ImportBean
         List<String> basePackages = getBasePackages(importingClassMetadata, attributes);
         
         // 创建并配置 Repository Bean 定义注册器
-        HibernateDataRepositoryBeanDefinitionRegistrar registrar = 
-            new HibernateDataRepositoryBeanDefinitionRegistrar();
+        JakartaDataRepositoryBeanDefinitionRegistrar registrar =
+            new JakartaDataRepositoryBeanDefinitionRegistrar();
         
         registrar.setBasePackages(basePackages);
-        registrar.setRepositoryImplementationPostfix(
+        registrar.setRepositoryImplementationSuffix(
             attributes.getString("repositoryImplementationPostfix"));
         registrar.setConsiderNestedRepositories(
             attributes.getBoolean("considerNestedRepositories"));

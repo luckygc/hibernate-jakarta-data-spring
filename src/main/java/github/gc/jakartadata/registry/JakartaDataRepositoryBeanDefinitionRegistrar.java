@@ -24,16 +24,14 @@ import java.util.List;
  * Hibernate Data Repository Bean 定义注册器
  * 负责扫描和注册 Repository 接口的 Bean 定义
  */
-public class HibernateDataRepositoryBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
+public class JakartaDataRepositoryBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
-    private static final Logger log = LoggerFactory.getLogger(HibernateDataRepositoryBeanDefinitionRegistrar.class);
+    private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryBeanDefinitionRegistrar.class);
     
     private static final String RESOURCE_PATTERN = "/**/*.class";
     
     private List<String> basePackages;
-    private String repositoryImplementationPostfix = "Repository";
-    private boolean considerNestedRepositories = false;
-    
+
     private final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     @Override
@@ -153,18 +151,5 @@ public class HibernateDataRepositoryBeanDefinitionRegistrar implements ImportBea
     private String generateBeanName(Class<?> repositoryInterface) {
         String simpleName = repositoryInterface.getSimpleName();
         return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-    }
-
-    // Getters and Setters
-    public void setBasePackages(List<String> basePackages) {
-        this.basePackages = basePackages;
-    }
-
-    public void setRepositoryImplementationPostfix(String repositoryImplementationPostfix) {
-        this.repositoryImplementationPostfix = repositoryImplementationPostfix;
-    }
-
-    public void setConsiderNestedRepositories(boolean considerNestedRepositories) {
-        this.considerNestedRepositories = considerNestedRepositories;
     }
 }

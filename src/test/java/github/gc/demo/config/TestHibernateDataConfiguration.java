@@ -1,6 +1,6 @@
 package github.gc.demo.config;
 
-import github.gc.jakartadata.annotation.EnableHibernateDataRepositories;
+import github.gc.jakartadata.annotation.EnableJakartaDataRepositories;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
@@ -19,7 +19,7 @@ import java.util.Properties;
  * 使用 H2 内存数据库
  */
 @org.springframework.context.annotation.Configuration
-@EnableHibernateDataRepositories(basePackages = "github.gc.demo.repository")
+@EnableJakartaDataRepositories(basePackages = "github.gc.demo.repository")
 @EnableTransactionManagement
 @ComponentScan(basePackages = "github.gc.demo")
 public class TestHibernateDataConfiguration {
