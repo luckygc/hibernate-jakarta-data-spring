@@ -1,8 +1,8 @@
 package github.gc.demo;
 
-import github.gc.hibernate.factory.HibernateSessionFactoryBean;
+import github.gc.jpa.factory.JpaEntityManagerFactoryBean;
 import github.gc.jakartadata.annotation.RepositoryScan;
-import org.hibernate.SessionFactory;
+import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.tool.schema.Action;
@@ -17,11 +17,11 @@ import java.util.Properties;
 public class DataConfiguration {
 
 	@Bean
-	public SessionFactory sessionFactory(DataSource dataSource) {
-		HibernateSessionFactoryBean sessionFactoryBean = new HibernateSessionFactoryBean();
-		sessionFactoryBean.setDataSource(dataSource);
-                sessionFactoryBean.setPackagesToScan(new String[]{"github.gc.**.model"});
-		Properties properties = sessionFactoryBean.getHibernateProperties();
+	public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
+		JpaEntityManagerFactoryBean entityManagerFactoryBean = new JpaEntityManagerFactoryBean();
+		entityManagerFactoryBean.setDataSource(dataSource);
+		entityManagerFactoryBean.setPackagesToScan(new String[]{"github.gc.**.model"});
+		Properties properties = entityManagerFactoryBean.getJpaProperties();
 		properties.put(AvailableSettings.SHOW_SQL, Boolean.FALSE);
 		properties.put(AvailableSettings.FORMAT_SQL, Boolean.TRUE);
 		properties.put(AvailableSettings.HBM2DDL_AUTO, Action.ACTION_UPDATE);
@@ -31,6 +31,6 @@ public class DataConfiguration {
 		properties.put(AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY, AccessType.READ_WRITE.getExternalName());
 		properties.put(AvailableSettings.USE_SECOND_LEVEL_CACHE, Boolean.FALSE);
 
-		return sessionFactoryBean.getObject();
+		return entityManagerFactoryBean.getObject();
 	}
 }

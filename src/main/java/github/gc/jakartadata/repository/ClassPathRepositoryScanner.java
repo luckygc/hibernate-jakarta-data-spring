@@ -65,7 +65,7 @@ public class ClassPathRepositoryScanner extends ClassPathBeanDefinitionScanner {
 			ConstructorArgumentValues constructorArgumentValues = definition.getConstructorArgumentValues();
 			constructorArgumentValues.addGenericArgumentValue(beanClassName);
 
-			definition.setBeanClass(RepositoryBean.class);
+			definition.setBeanClass(JpaRepositoryBean.class);
 			definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		}
 	}
