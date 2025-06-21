@@ -123,18 +123,25 @@ public class HibernateDataRepositoryBeanDefinitionRegistrar implements ImportBea
     private void registerRepositoryBean(BeanDefinitionRegistry registry, String className) {
         try {
             Class<?> repositoryInterface = Class.forName(className);
-            
+
+            String beanName = generateBeanName(repositoryInterface);
+
+            // 检查是否已经注册过
+            if (registry.containsBeanDefinition(beanName)) {
+                log.debug("Repository bean already registered: {}", beanName);
+                return;
+            }
+
             BeanDefinitionBuilder builder = BeanDefinitionBuilder
                 .genericBeanDefinition(HibernateDataRepositoryFactoryBean.class);
-            
+
             builder.addConstructorArgValue(repositoryInterface);
             builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            
-            String beanName = generateBeanName(repositoryInterface);
+
             registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
-            
+
             log.debug("Registered Hibernate Data Repository: {} as bean: {}", className, beanName);
-            
+
         } catch (Exception e) {
             log.error("Failed to register repository bean for class: {}", className, e);
         }
