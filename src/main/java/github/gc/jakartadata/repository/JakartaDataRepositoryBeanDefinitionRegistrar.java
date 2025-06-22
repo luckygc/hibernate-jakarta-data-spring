@@ -1,6 +1,5 @@
-package github.gc.jakartadata.registry;
+package github.gc.jakartadata.repository;
 
-import github.gc.jakartadata.factory.JakartaDataRepositoryFactoryBean;
 import jakarta.data.repository.Repository;
 import java.util.List;
 import org.slf4j.Logger;

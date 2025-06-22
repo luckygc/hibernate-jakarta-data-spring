@@ -1,4 +1,4 @@
-package github.gc.jakartadata.proxy;
+package github.gc.jakartadata.repository;
 
 import github.gc.jakartadata.ExceptionUtil;
 import github.gc.jakartadata.session.StatelessSessionUtils;

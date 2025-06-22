@@ -1,6 +1,5 @@
 package github.gc.jakartadata.annotation;
 
-import github.gc.jakartadata.config.JakartaDataRepositoryConfigurationExtension;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -13,7 +12,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(JakartaDataRepositoryConfigurationExtension.class)
+@Import(JakartaDataRepositoryRegistrar.class)
 public @interface EnableJakartaDataRepositories {
 
     /**

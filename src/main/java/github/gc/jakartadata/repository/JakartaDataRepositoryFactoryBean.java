@@ -1,6 +1,5 @@
-package github.gc.jakartadata.factory;
+package github.gc.jakartadata.repository;
 
-import github.gc.jakartadata.proxy.JakartaDataRepositoryProxy;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

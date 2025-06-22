@@ -1,7 +1,6 @@
-package github.gc.jakartadata.config;
+package github.gc.jakartadata.annotation;
 
-import github.gc.jakartadata.annotation.EnableJakartaDataRepositories;
-import github.gc.jakartadata.registry.JakartaDataRepositoryBeanDefinitionRegistrar;
+import github.gc.jakartadata.repository.JakartaDataRepositoryBeanDefinitionRegistrar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -22,9 +21,9 @@ import java.util.List;
  *
  * @author gc
  */
-public class JakartaDataRepositoryConfigurationExtension implements ImportBeanDefinitionRegistrar {
+public class JakartaDataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
 
-    private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryConfigurationExtension.class);
+    private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryRegistrar.class);
 
     @Override
     public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata,
