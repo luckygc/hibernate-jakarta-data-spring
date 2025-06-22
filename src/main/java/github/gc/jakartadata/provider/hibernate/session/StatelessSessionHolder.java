@@ -1,4 +1,4 @@
-package github.gc.jakartadata.session;
+package github.gc.jakartadata.provider.hibernate.session;
 
 import org.hibernate.StatelessSession;
 import org.springframework.lang.NonNull;

@@ -1,7 +1,7 @@
 package github.gc.jakartadata.repository;
 
 import github.gc.jakartadata.ExceptionUtil;
-import github.gc.jakartadata.session.StatelessSessionUtils;
+import github.gc.jakartadata.provider.hibernate.session.StatelessSessionUtils;
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.CallSite;

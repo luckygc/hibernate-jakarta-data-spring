@@ -15,8 +15,7 @@ import javax.sql.DataSource;
 import java.lang.reflect.Proxy;
 
 /**
- * Jakarta Data Repository 工厂 Bean
- * 负责创建 Repository 接口的代理实例
+ * Jakarta Data Repository 工厂 Bean 负责创建 Repository 接口的代理实例
  *
  * @author gc
  */
@@ -39,7 +38,7 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         Assert.notNull(beanFactory, "BeanFactory is required");
 
         log.debug("Initialized JakartaDataRepositoryFactoryBean for interface: {}",
-                 repositoryInterface.getName());
+            repositoryInterface.getName());
     }
 
     @Override
@@ -62,8 +61,7 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
     }
 
     /**
-     * 创建 Repository 代理实例
-     * 延迟获取依赖，避免早期初始化问题
+     * 创建 Repository 代理实例 延迟获取依赖，避免早期初始化问题
      */
     @SuppressWarnings("unchecked")
     private void createRepositoryProxy() {
@@ -71,7 +69,7 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         SessionFactory sessionFactory = beanFactory.getBean(SessionFactory.class);
         DataSource dataSource = beanFactory.getBean(DataSource.class);
 
-        JakartaDataRepositoryProxy<T,? extends T> invocationHandler =
+        JakartaDataRepositoryProxy<T, ? extends T> invocationHandler =
             new JakartaDataRepositoryProxy<>(repositoryInterface, sessionFactory, dataSource);
 
         repositoryProxy = (T) Proxy.newProxyInstance(
@@ -83,7 +81,6 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         log.debug("Created proxy for repository interface: {}", repositoryInterface.getName());
     }
 
-    // Getters and Setters
     public Class<T> getRepositoryInterface() {
         return repositoryInterface;
     }

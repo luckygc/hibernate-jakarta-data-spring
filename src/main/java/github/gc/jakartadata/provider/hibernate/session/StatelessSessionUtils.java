@@ -1,4 +1,4 @@
-package github.gc.jakartadata.session;
+package github.gc.jakartadata.provider.hibernate.session;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
