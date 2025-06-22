@@ -1,4 +1,4 @@
-package github.gc.jakartadata.repository;
+package github.gc.jakartadata.provider.hibernate;
 
 import github.gc.jakartadata.ExceptionUtil;
 import github.gc.jakartadata.provider.hibernate.session.StatelessSessionUtils;
