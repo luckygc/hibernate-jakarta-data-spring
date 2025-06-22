@@ -5,7 +5,7 @@
 
     <groupId>github.gc</groupId>
     <artifactId>hibernate-data-repositories-spring</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.1</version>
 
     <packaging>jar</packaging>
     <name>hibernate-data-repositories-spring</name>
@@ -16,9 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakarta.data.version>1.0.1</jakarta.data.version>
         <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
-        <jspecify.version>1.0.0</jspecify.version>
         <hibernate.version>7.0.2.Final</hibernate.version>
-        <hibernate-validator.version>9.0.0.Final</hibernate-validator.version>
         <spring.version>6.2.7</spring.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <jmh.version>1.37</jmh.version>
