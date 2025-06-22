@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.support.ResourceHolderSupport;
 import org.springframework.transaction.support.ResourceHolderSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -49,7 +50,7 @@ public abstract class StatelessSessionUtils {
         StatelessSessionHolder holder = (StatelessSessionHolder)
             TransactionSynchronizationManager.getResource(resourceKey);
 
-        if (holder != null && holder.hasValidSession()) {
+        if (holder != null) {
             log.debug("Found existing transactional StatelessSession");
             return holder.getStatelessSession();
         }
@@ -91,7 +92,7 @@ public abstract class StatelessSessionUtils {
     /**
      * StatelessSession 资源同步器 用于在事务结束时清理 Session 资源
      */
-    private static class StatelessSessionResourceSynchronization
+    public static class StatelessSessionResourceSynchronization
         extends ResourceHolderSynchronization<StatelessSessionHolder, String> {
 
         public StatelessSessionResourceSynchronization(StatelessSessionHolder resourceHolder,
@@ -104,6 +105,20 @@ public abstract class StatelessSessionUtils {
             StatelessSession session = resourceHolder.getStatelessSession();
             closeSession(session);
             log.debug("Released transactional StatelessSession after transaction completion");
+        }
+    }
+
+    public static class StatelessSessionHolder extends ResourceHolderSupport {
+
+        private final StatelessSession statelessSession;
+
+        public StatelessSessionHolder(@NonNull StatelessSession statelessSession) {
+            this.statelessSession = statelessSession;
+        }
+
+        @NonNull
+        public StatelessSession getStatelessSession() {
+            return this.statelessSession;
         }
     }
 }
