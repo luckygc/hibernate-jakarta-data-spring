@@ -2,75 +2,59 @@ package github.gc.jakartadata.proxy;
 
 import github.gc.jakartadata.ExceptionUtil;
 import github.gc.jakartadata.session.StatelessSessionUtils;
-import java.lang.reflect.Constructor;
+import java.io.Serial;
+import java.io.Serializable;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.function.Function;
+import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
-
-import javax.sql.DataSource;
-import java.io.Serial;
-import java.io.Serializable;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Jakarta Data Repository 代理类 负责拦截 Repository 方法调用并委托给实际的实现
  *
  * @author gc
  */
-public class JakartaDataRepositoryProxy<T> implements InvocationHandler, Serializable {
+public class JakartaDataRepositoryProxy<T, I extends T> implements InvocationHandler, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryProxy.class);
 
-    private static final Method privateLookupInMethod;
+    private static final ThreadLocal<StatelessSession> threadLocalSession = new ThreadLocal<>();
 
-    private final Class<T> repositoryInterface;
-    private final Constructor<?> implementationConstructor;
+    private final Function<StatelessSession, I> constructorInvoker;
     private final SessionFactory sessionFactory;
     private final DataSource dataSource;
 
-    // 缓存 default 方法的 MethodHandle
-    private final ConcurrentHashMap<Method, MethodHandle> methodHandleCache = new ConcurrentHashMap<>();
-
-    static {
-        Method privateLookupIn;
-        try {
-            privateLookupIn = MethodHandles.class.getMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
-        } catch (NoSuchMethodException e) {
-            privateLookupIn = null;
-        }
-        privateLookupInMethod = privateLookupIn;
-    }
-
-    public JakartaDataRepositoryProxy(@NonNull Class<T> repositoryInterface,
-        @NonNull SessionFactory sessionFactory,
+    public JakartaDataRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull SessionFactory sessionFactory,
         @NonNull DataSource dataSource) {
-        this.repositoryInterface = repositoryInterface;
         this.sessionFactory = sessionFactory;
         this.dataSource = dataSource;
 
         var implementationClass = getImplementationClass(repositoryInterface);
-        this.implementationConstructor = getImplementationConstructor(implementationClass);
+        this.constructorInvoker = createConstructorInvoker(implementationClass);
     }
 
     /**
      * 获取 Hibernate 生成的实现类
      */
-    private Class<?> getImplementationClass(Class<?> repositoryInterface) {
+    @SuppressWarnings("unchecked")
+    private Class<I> getImplementationClass(Class<T> repositoryInterface) {
         try {
             String implementationClassName = repositoryInterface.getName() + "_";
-            return Class.forName(implementationClassName);
+            return (Class<I>) Class.forName(implementationClassName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Cannot find implementation class for repository: " +
                 repositoryInterface.getName(), e);
@@ -78,87 +62,69 @@ public class JakartaDataRepositoryProxy<T> implements InvocationHandler, Seriali
     }
 
     /**
-     * 获取实现类的构造函数
+     * 使用 LambdaMetafactory 创建构造函数调用器
      */
-    private Constructor<?> getImplementationConstructor(Class<?> implementationClass) {
+    private Function<StatelessSession, I> createConstructorInvoker(Class<I> implementationClass) {
         try {
-            return implementationClass.getDeclaredConstructor(StatelessSession.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Cannot find constructor with StatelessSession parameter for class: " +
+            // 获取 MethodHandles.Lookup
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+            // 创建构造函数的 MethodHandle
+            MethodHandle constructorHandle = lookup.findConstructor(implementationClass,
+                MethodType.methodType(void.class, StatelessSession.class));
+
+            // 使用 LambdaMetafactory 创建 Function
+            CallSite callSite = LambdaMetafactory.metafactory(
+                lookup,
+                "apply",                                                    // 函数式接口方法名
+                MethodType.methodType(Function.class),                     // 调用点类型
+                MethodType.methodType(Object.class, Object.class),         // 函数式接口方法类型 (Function.apply的签名)
+                constructorHandle,                                          // 实际实现的方法句柄
+                MethodType.methodType(implementationClass, StatelessSession.class) // 实际方法类型
+            );
+
+            @SuppressWarnings("unchecked")
+            Function<StatelessSession, I> invoker = (Function<StatelessSession, I>) callSite.getTarget()
+                .invokeExact();
+
+            return invoker;
+
+        } catch (Throwable e) {
+            throw new RuntimeException("Cannot create constructor invoker for class: " +
                 implementationClass.getName(), e);
         }
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        StatelessSession session = null;
+        boolean isSynchronizationActive = TransactionSynchronizationManager.isSynchronizationActive();
+
         try {
             // 处理 Object 类的方法
             if (Object.class.equals(method.getDeclaringClass())) {
                 return method.invoke(this, args);
             }
 
-            if (method.isDefault()) {
-                return invokeDefaultMethod(proxy, method, args);
+            if (isSynchronizationActive) {
+                session = StatelessSessionUtils.getTransactionalSession(sessionFactory, dataSource);
+            } else if (threadLocalSession.get() != null) {
+                session = threadLocalSession.get();
             } else {
-                return invokePlainMethod(method, args);
+                session = sessionFactory.openStatelessSession();
+                threadLocalSession.set(session);
             }
+
+            Object repositoryImpl = constructorInvoker.apply(session);
+
+            return method.invoke(repositoryImpl, args);
         } catch (Throwable t) {
             throw ExceptionUtil.unwrapThrowable(t);
-        }
-    }
-
-    /**
-     * 调用 default 方法
-     */
-    private Object invokeDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        try {
-            MethodHandle methodHandle = methodHandleCache.computeIfAbsent(method, this::createMethodHandle);
-            return methodHandle.bindTo(proxy).invokeWithArguments(args);
-        } catch (Exception e) {
-            log.error("Error invoking default method: {}.{}",
-                repositoryInterface.getSimpleName(), method.getName(), e);
-            throw e;
-        }
-    }
-
-    private Object invokePlainMethod(Method method, Object[] args) throws Throwable {
-        StatelessSession session = StatelessSessionUtils.getSession(sessionFactory, dataSource);
-        boolean shouldCloseSession = StatelessSessionUtils.shouldCloseSession(sessionFactory, dataSource);
-
-        try {
-            // 创建 Repository 实现实例
-            Object repositoryImpl = implementationConstructor.newInstance(session);
-
-            // 调用实际方法
-            return method.invoke(repositoryImpl, args);
-
         } finally {
-            // 如果需要关闭 Session
-            if (shouldCloseSession) {
+            if (session != null && !isSynchronizationActive) {
                 StatelessSessionUtils.closeSession(session);
+                threadLocalSession.remove();
             }
         }
-    }
-
-    /**
-     * 创建 default 方法的 MethodHandle
-     */
-    private MethodHandle createMethodHandle(Method method) {
-        try {
-            return getMethodHandleJava9(method);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Failed to create MethodHandle for default method: " + method, e);
-        }
-    }
-
-    /**
-     * 获取 Java 9+ 的 MethodHandle
-     */
-    private MethodHandle getMethodHandleJava9(Method method)
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        final Class<?> declaringClass = method.getDeclaringClass();
-        return ((Lookup) privateLookupInMethod.invoke(null, declaringClass, MethodHandles.lookup())).findSpecial(
-            declaringClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
-            declaringClass);
     }
 }

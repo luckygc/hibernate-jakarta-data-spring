@@ -109,7 +109,8 @@ public class JakartaDataRepositoryBeanDefinitionRegistrar implements ImportBeanD
                 .genericBeanDefinition(JakartaDataRepositoryFactoryBean.class);
 
             builder.addPropertyValue("repositoryInterface", repositoryInterface);
-            builder.setRole(BeanDefinition.ROLE_APPLICATION);
+            // 设置为 INFRASTRUCTURE 角色，避免被某些 BeanPostProcessor 处理
+            builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
             String beanName = generateBeanName(repositoryInterface);
             registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
