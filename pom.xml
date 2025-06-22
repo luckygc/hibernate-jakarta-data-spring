@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>github.gc</groupId>
-    <artifactId>hibernate-jakarta-data-spring</artifactId>
+    <artifactId>hibernate-data-repositories-spring</artifactId>
     <version>0.0.1</version>
 
     <packaging>jar</packaging>
-    <name>hibernate-jakarta-data-spring</name>
-    <description>Hibernate Jakarta Data Spring Integration - 全新�?Hibernate Data Repository �?Spring 集成方案</description>
+    <name>hibernate-data-repositories-spring</name>
+    <description>适配spring和hibernate data repositories</description>
 
     <properties>
         <java.version>21</java.version>
@@ -20,7 +20,6 @@
         <hibernate.version>7.0.2.Final</hibernate.version>
         <hibernate-validator.version>9.0.0.Final</hibernate-validator.version>
         <spring.version>6.2.7</spring.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -77,48 +76,6 @@
             <version>2.0.16</version>
         </dependency>
 
-        <!-- 测试依赖 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>3.4.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>3.4.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.4.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-            <version>3.4.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.224</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -126,7 +83,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-parameters</arg>
