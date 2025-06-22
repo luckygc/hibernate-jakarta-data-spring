@@ -10,7 +10,27 @@ Hibernate Data Repository 与 Spring 框架集成的实现方案。该方案直�
 
 ## 使用方法
 
-### 1. 配置类
+### pom.xml
+
+```xml
+
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+<dependency>
+    <groupId>com.github.luckygc</groupId>
+    <artifactId>hibernate-jakarta-data-spring</artifactId>
+    <version>1.0.0</version>
+</dependency>
+</dependencies>
+```
+
+### 2. 配置类
 
 ```java
 @Configuration
