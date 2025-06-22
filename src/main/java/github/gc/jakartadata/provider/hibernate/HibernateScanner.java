@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
@@ -21,52 +20,36 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.ClassUtils;
 
-/**
- * Hibernate实体类扫描器
- * <p>
- * 用于扫描指定包路径下的JPA实体类、映射超类和转换器，并将其添加到Hibernate持久化配置中。
- * 该类提供了自动发现和注册Hibernate管理类的功能，避免手动配置每个实体类。
- * </p>
- *
- * @author repodar
- * @since 1.0.0
- */
-@RequiredArgsConstructor
 public class HibernateScanner {
 
     /**
-     * 类文件资源匹配模式
-     * 用于匹配包路径下的所有.class文件
+     * 类文件资源匹配模式 用于匹配包路径下的所有.class文件
      */
     private static final String RESOURCE_PATTERN = "/**/*.class";
 
     /**
-     * 实体类型过滤器数组
-     * 包含Entity和MappedSuperclass注解的过滤器，用于识别JPA实体类和映射超类
+     * 实体类型过滤器数组 包含Entity和MappedSuperclass注解的过滤器，用于识别JPA实体类和映射超类
      */
     private static final TypeFilter[] ENTITY_TYPE_FILTERS = new TypeFilter[]{
         new AnnotationTypeFilter(Entity.class, false), new AnnotationTypeFilter(MappedSuperclass.class, false)};
 
     /**
-     * 转换器类型过滤器
-     * 用于识别标注了@Converter注解的属性转换器类
+     * 转换器类型过滤器 用于识别标注了@Converter注解的属性转换器类
      */
     private static final TypeFilter CONVERTER_TYPE_FILTER = new AnnotationTypeFilter(Converter.class, false);
 
     /**
-     * 资源模式解析器
-     * 用于解析类路径下的资源文件
+     * 资源模式解析器 用于解析类路径下的资源文件
      */
     private static final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     /**
      * 扫描指定包路径下的实体类并添加到Hibernate配置中
      * <p>
-     * 该方法会扫描指定包路径下的所有类文件，识别标注了@Entity、@MappedSuperclass或@Converter注解的类，
-     * 并将这些类添加到Hibernate持久化配置中作为管理类。
+     * 该方法会扫描指定包路径下的所有类文件，识别标注了@Entity、@MappedSuperclass或@Converter注解的类， 并将这些类添加到Hibernate持久化配置中作为管理类。
      * </p>
      *
-     * @param configuration Hibernate持久化配置对象
+     * @param configuration  Hibernate持久化配置对象
      * @param packagesToScan 要扫描的包路径数组，支持多个包路径
      * @throws HibernateException 当扫描过程中发生错误时抛出
      */
@@ -129,7 +112,7 @@ public class HibernateScanner {
      * 该方法检查给定的类是否标注了@Entity或@MappedSuperclass注解。
      * </p>
      *
-     * @param reader 类的元数据读取器
+     * @param reader        类的元数据读取器
      * @param readerFactory 元数据读取器工厂
      * @return 如果类匹配任一实体类型过滤器则返回true，否则返回false
      * @throws IOException 当读取类元数据时发生IO异常
