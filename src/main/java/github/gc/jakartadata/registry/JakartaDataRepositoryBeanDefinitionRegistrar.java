@@ -1,80 +1,77 @@
 package github.gc.jakartadata.registry;
 
-import github.gc.jakartadata.factory.HibernateDataRepositoryFactoryBean;
+import github.gc.jakartadata.factory.JakartaDataRepositoryFactoryBean;
 import jakarta.data.repository.Repository;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.NonNull;
-
-import java.util.List;
+import org.springframework.util.ClassUtils;
 
 /**
- * Hibernate Data Repository Bean 定义注册器
- * 参考 MyBatis MapperScannerConfigurer 的简洁设计
+ * Jakarta Data Repository Bean 定义注册器
+ * 负责扫描和注册 Repository 接口为 Spring Bean
+ * 
+ * @author gc
  */
 public class JakartaDataRepositoryBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
     private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryBeanDefinitionRegistrar.class);
+    private static final String RESOURCE_PATTERN = "/**/*.class";
+
+    private final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     private List<String> basePackages;
 
     @Override
-    public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata,
+    public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata, 
                                       @NonNull BeanDefinitionRegistry registry) {
-
+        
         if (basePackages == null || basePackages.isEmpty()) {
-            log.warn("No base packages specified for Hibernate Data Repository scanning");
+            log.warn("No base packages specified for Jakarta Data Repository scanning");
             return;
         }
 
         try {
             scanAndRegisterRepositories(registry);
         } catch (Exception e) {
-            log.error("Failed to scan and register Hibernate Data Repositories", e);
+            log.error("Failed to scan and register Jakarta Data Repositories", e);
             throw new RuntimeException("Repository registration failed", e);
         }
     }
 
     /**
      * 扫描并注册 Repository 接口
-     * 参考 MyBatis 使用 ClassPathScanningCandidateComponentProvider 的方式
      */
-    private void scanAndRegisterRepositories(BeanDefinitionRegistry registry) {
-        // 创建组件扫描器
-        ClassPathScanningCandidateComponentProvider scanner =
-            new ClassPathScanningCandidateComponentProvider(false) {
-                @Override
-                protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-                    // 只扫描接口
-                    return beanDefinition.getMetadata().isInterface() &&
-                           beanDefinition.getMetadata().isIndependent();
-                }
-            };
-
-        // 添加过滤器：扫描带有 @Repository 注解的接口
-        scanner.addIncludeFilter(new AnnotationTypeFilter(Repository.class));
-
-        // 扫描每个包
+    private void scanAndRegisterRepositories(BeanDefinitionRegistry registry) throws Exception {
+        MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
+        
         for (String basePackage : basePackages) {
-            for (BeanDefinition candidate : scanner.findCandidateComponents(basePackage)) {
-                String className = candidate.getBeanClassName();
-                if (className != null) {
+            String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + 
+                           ClassUtils.convertClassNameToResourcePath(basePackage) + RESOURCE_PATTERN;
+            
+            Resource[] resources = resourcePatternResolver.getResources(pattern);
+            
+            for (Resource resource : resources) {
+                if (resource.isReadable()) {
                     try {
-                        Class<?> repositoryInterface = Class.forName(className);
-                        if (isJakartaDataRepository(repositoryInterface)) {
-                            registerRepositoryBean(registry, repositoryInterface);
+                        MetadataReader reader = readerFactory.getMetadataReader(resource);
+                        if (isRepositoryInterface(reader)) {
+                            registerRepositoryBean(registry, reader.getClassMetadata().getClassName());
                         }
                     } catch (Exception e) {
-                        log.warn("Failed to process repository interface: {}", className, e);
+                        log.warn("Failed to read resource: {}", resource, e);
                     }
                 }
             }
@@ -82,39 +79,46 @@ public class JakartaDataRepositoryBeanDefinitionRegistrar implements ImportBeanD
     }
 
     /**
-     * 检查是否为 Jakarta Data Repository 接口
+     * 判断是否为 Repository 接口
      */
-    private boolean isJakartaDataRepository(Class<?> clazz) {
-        // 检查是否直接或间接继承自 Jakarta Data Repository 相关接口
-        return jakarta.data.repository.Repository.class.isAssignableFrom(clazz) ||
-               jakarta.data.repository.CrudRepository.class.isAssignableFrom(clazz) ||
-               jakarta.data.repository.DataRepository.class.isAssignableFrom(clazz);
+    private boolean isRepositoryInterface(MetadataReader reader) {
+        try {
+            // 检查是否为接口
+            if (!reader.getClassMetadata().isInterface()) {
+                return false;
+            }
+
+            // 检查是否有 @Repository 注解
+            return reader.getAnnotationMetadata().hasAnnotation(Repository.class.getName());
+
+        } catch (Exception e) {
+            log.debug("Failed to check if class is repository interface: {}",
+                     reader.getClassMetadata().getClassName(), e);
+            return false;
+        }
     }
 
     /**
      * 注册 Repository Bean 定义
-     * 参考 MyBatis 的简洁注册方式
      */
-    private void registerRepositoryBean(BeanDefinitionRegistry registry, Class<?> repositoryInterface) {
-        String beanName = generateBeanName(repositoryInterface);
+    private void registerRepositoryBean(BeanDefinitionRegistry registry, String className) {
+        try {
+            Class<?> repositoryInterface = Class.forName(className);
 
-        // 检查是否已经注册过
-        if (registry.containsBeanDefinition(beanName)) {
-            log.debug("Repository bean already registered: {}", beanName);
-            return;
+            BeanDefinitionBuilder builder = BeanDefinitionBuilder
+                .genericBeanDefinition(JakartaDataRepositoryFactoryBean.class);
+
+            builder.addPropertyValue("repositoryInterface", repositoryInterface);
+            builder.setRole(BeanDefinition.ROLE_APPLICATION);
+
+            String beanName = generateBeanName(repositoryInterface);
+            registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
+
+            log.debug("Registered Repository bean: {} -> {}", beanName, className);
+
+        } catch (Exception e) {
+            log.error("Failed to register Repository bean for class: {}", className, e);
         }
-
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder
-            .genericBeanDefinition(HibernateDataRepositoryFactoryBean.class);
-
-        builder.addConstructorArgValue(repositoryInterface);
-        builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-        builder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
-
-        registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
-
-        log.debug("Registered Hibernate Data Repository: {} as bean: {}",
-                 repositoryInterface.getName(), beanName);
     }
 
     /**
@@ -125,7 +129,7 @@ public class JakartaDataRepositoryBeanDefinitionRegistrar implements ImportBeanD
         return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
     }
 
-    // Setter for base packages
+    // Setters
     public void setBasePackages(List<String> basePackages) {
         this.basePackages = basePackages;
     }

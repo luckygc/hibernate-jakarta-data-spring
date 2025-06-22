@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * 启用 Hibernate Data Repository 支持的注解
- * 用于扫描和注册 Jakarta Data Repository 接口
+ * 启用 Jakarta Data Repository 支持的注解
+ *
+ * @author gc
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
