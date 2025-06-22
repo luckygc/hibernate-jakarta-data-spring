@@ -69,6 +69,18 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!-- JAXB 依赖 (Java 9+ 需要) -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+
         <!-- 日志依赖 -->
         <dependency>
             <groupId>org.slf4j</groupId>
