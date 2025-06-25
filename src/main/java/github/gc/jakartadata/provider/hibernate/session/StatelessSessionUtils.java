@@ -14,8 +14,6 @@ import org.springframework.transaction.support.ResourceHolderSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * StatelessSession 工具类 提供 StatelessSession 的获取、绑定和释放功能 遵循 Spring 的资源管理模式（类似 DataSourceUtils）
- *
  * @author gc
  */
 public abstract class StatelessSessionUtils {
