@@ -1,7 +1,5 @@
 package github.luckygc.jakartadata.provider.hibernate.session;
 
-import java.sql.Connection;
-import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
@@ -12,6 +10,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.ResourceHolderSupport;
 import org.springframework.transaction.support.ResourceHolderSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.sql.Connection;
+
+import javax.sql.DataSource;
 
 /**
  * @author luckygc

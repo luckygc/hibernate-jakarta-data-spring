@@ -1,6 +1,5 @@
 package github.luckygc.jakartadata.provider.hibernate;
 
-import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.jpa.HibernatePersistenceConfiguration;
@@ -8,7 +7,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class SessionFactoryBean implements FactoryBean<SessionFactory>, InitializingBean, DisposableBean {
+import javax.sql.DataSource;
+
+public class SessionFactoryBean
+        implements FactoryBean<SessionFactory>, InitializingBean, DisposableBean {
 
     private DataSource dataSource;
 
@@ -35,7 +37,9 @@ public class SessionFactoryBean implements FactoryBean<SessionFactory>, Initiali
 
     @Override
     public Class<?> getObjectType() {
-        return (this.sessionFactory != null ? this.sessionFactory.getClass() : SessionFactory.class);
+        return (this.sessionFactory != null
+                ? this.sessionFactory.getClass()
+                : SessionFactory.class);
     }
 
     @Override

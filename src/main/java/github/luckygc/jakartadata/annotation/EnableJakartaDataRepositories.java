@@ -15,8 +15,6 @@ import java.lang.annotation.*;
 @Import(JakartaDataRepositoryRegistrar.class)
 public @interface EnableJakartaDataRepositories {
 
-    /**
-     * 要扫描的基础包路径
-     */
+    /** 要扫描的基础包路径 */
     String[] basePackages() default {};
 }

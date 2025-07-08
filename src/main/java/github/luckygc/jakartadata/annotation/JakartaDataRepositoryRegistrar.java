@@ -1,10 +1,9 @@
 package github.luckygc.jakartadata.annotation;
 
 import github.luckygc.jakartadata.repository.JakartaDataRepositoryFactoryBean;
+
 import jakarta.data.repository.Repository;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -22,6 +21,10 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Jakarta Data Repository 配置扩展 负责解析 @EnableJakartaDataRepositories 注解并注册相关 Bean

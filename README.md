@@ -15,12 +15,12 @@
 - **动态查询DSL** - 使用Hibernate 7.x的全新Restriction DSL实现动态查询
 - **无状态** - 没有级联操作，没有懒加载，没有只读事务，同步操作，没有事务后写
 
-
 ## 🚀 快速开始
 
 ### 1. 添加依赖,添加注解处理器
 
 ```xml
+
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -29,11 +29,11 @@
 </repositories>
 
 <dependencies>
-    <dependency>
-        <groupId>com.github.luckygc</groupId>
-        <artifactId>hibernate-jakarta-data-spring</artifactId>
-        <version>1.0.0</version>
-    </dependency>
+<dependency>
+    <groupId>com.github.luckygc</groupId>
+    <artifactId>hibernate-jakarta-data-spring</artifactId>
+    <version>1.0.0</version>
+</dependency>
 </dependencies>
 
 <build>
@@ -63,7 +63,7 @@
             </annotationProcessorPaths>
         </configuration>
     </plugin>
-    
+
 </plugins>
 </build>
 ```
@@ -71,6 +71,7 @@
 ### 2. 配置类
 
 ```java
+
 @Configuration
 @EnableJakartaDataRepositories(basePackages = "com.example.repository")
 public class HibernateDataConfiguration {
@@ -88,6 +89,7 @@ public class HibernateDataConfiguration {
 ---
 
 **📖 更多信息**
+
 - [Jakarta Data 规范](https://jakarta.ee/specifications/data/)
 - [Hibernate Data Repositories 文档](https://hibernate.org/repositories/)
 - [Spring Framework 文档](https://docs.spring.io/spring-framework/docs/current/reference/html/)

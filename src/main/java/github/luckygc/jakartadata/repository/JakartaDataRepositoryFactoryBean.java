@@ -1,6 +1,7 @@
 package github.luckygc.jakartadata.repository;
 
 import github.luckygc.jakartadata.provider.hibernate.JakartaDataRepositoryProxy;
+
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,17 +13,20 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Proxy;
+
+import javax.sql.DataSource;
 
 /**
  * Jakarta Data Repository 工厂 Bean 负责创建 Repository 接口的代理实例
  *
  * @author luckygc
  */
-public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, InitializingBean, BeanFactoryAware {
+public class JakartaDataRepositoryFactoryBean<T>
+        implements FactoryBean<T>, InitializingBean, BeanFactoryAware {
 
-    private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryFactoryBean.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(JakartaDataRepositoryFactoryBean.class);
 
     private Class<T> repositoryInterface;
     private BeanFactory beanFactory;
@@ -38,8 +42,9 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         Assert.notNull(repositoryInterface, "Property 'repositoryInterface' is required");
         Assert.notNull(beanFactory, "BeanFactory is required");
 
-        log.debug("Initialized JakartaDataRepositoryFactoryBean for interface: {}",
-            repositoryInterface.getName());
+        log.debug(
+                "Initialized JakartaDataRepositoryFactoryBean for interface: {}",
+                repositoryInterface.getName());
     }
 
     @Override
@@ -61,9 +66,7 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         return true;
     }
 
-    /**
-     * 创建 Repository 代理实例 延迟获取依赖，避免早期初始化问题
-     */
+    /** 创建 Repository 代理实例 延迟获取依赖，避免早期初始化问题 */
     @SuppressWarnings("unchecked")
     private void createRepositoryProxy() {
         // 延迟获取 SessionFactory 和 DataSource，避免早期初始化
@@ -71,13 +74,14 @@ public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, Init
         DataSource dataSource = beanFactory.getBean(DataSource.class);
 
         JakartaDataRepositoryProxy<T, ? extends T> invocationHandler =
-            new JakartaDataRepositoryProxy<>(repositoryInterface, sessionFactory, dataSource);
+                new JakartaDataRepositoryProxy<>(repositoryInterface, sessionFactory, dataSource);
 
-        repositoryProxy = (T) Proxy.newProxyInstance(
-            repositoryInterface.getClassLoader(),
-            new Class<?>[]{repositoryInterface},
-            invocationHandler
-        );
+        repositoryProxy =
+                (T)
+                        Proxy.newProxyInstance(
+                                repositoryInterface.getClassLoader(),
+                                new Class<?>[] {repositoryInterface},
+                                invocationHandler);
 
         log.debug("Created proxy for repository interface: {}", repositoryInterface.getName());
     }
