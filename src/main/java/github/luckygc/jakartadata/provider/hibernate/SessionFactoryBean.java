@@ -1,4 +1,4 @@
-package github.gc.jakartadata.provider.hibernate;
+package github.luckygc.jakartadata.provider.hibernate;
 
 import javax.sql.DataSource;
 import org.hibernate.SessionFactory;

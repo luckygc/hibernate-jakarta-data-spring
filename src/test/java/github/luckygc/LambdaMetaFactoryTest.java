@@ -1,4 +1,4 @@
-package github.gc;
+package github.luckygc;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;

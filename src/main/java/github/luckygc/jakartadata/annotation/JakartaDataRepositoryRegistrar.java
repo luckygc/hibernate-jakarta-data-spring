@@ -1,6 +1,6 @@
-package github.gc.jakartadata.annotation;
+package github.luckygc.jakartadata.annotation;
 
-import github.gc.jakartadata.repository.JakartaDataRepositoryFactoryBean;
+import github.luckygc.jakartadata.repository.JakartaDataRepositoryFactoryBean;
 import jakarta.data.repository.Repository;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 /**
  * Jakarta Data Repository 配置扩展 负责解析 @EnableJakartaDataRepositories 注解并注册相关 Bean
  *
- * @author gc
+ * @author luckygc
  */
 public class JakartaDataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
 

@@ -1,6 +1,6 @@
-package github.gc.jakartadata.repository;
+package github.luckygc.jakartadata.repository;
 
-import github.gc.jakartadata.provider.hibernate.JakartaDataRepositoryProxy;
+import github.luckygc.jakartadata.provider.hibernate.JakartaDataRepositoryProxy;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.lang.reflect.Proxy;
 /**
  * Jakarta Data Repository 工厂 Bean 负责创建 Repository 接口的代理实例
  *
- * @author gc
+ * @author luckygc
  */
 public class JakartaDataRepositoryFactoryBean<T> implements FactoryBean<T>, InitializingBean, BeanFactoryAware {
 

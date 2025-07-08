@@ -1,4 +1,4 @@
-package github.gc.jakartadata;
+package github.luckygc.jakartadata;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;

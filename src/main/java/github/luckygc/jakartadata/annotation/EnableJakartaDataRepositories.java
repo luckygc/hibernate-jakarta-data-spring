@@ -1,4 +1,4 @@
-package github.gc.jakartadata.annotation;
+package github.luckygc.jakartadata.annotation;
 
 import org.springframework.context.annotation.Import;
 
@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 /**
  * 启用 Jakarta Data Repository 支持的注解
  *
- * @author gc
+ * @author luckygc
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

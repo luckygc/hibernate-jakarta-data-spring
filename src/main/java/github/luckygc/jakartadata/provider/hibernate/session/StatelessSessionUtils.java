@@ -1,4 +1,4 @@
-package github.gc.jakartadata.provider.hibernate.session;
+package github.luckygc.jakartadata.provider.hibernate.session;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
@@ -14,7 +14,7 @@ import org.springframework.transaction.support.ResourceHolderSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * @author gc
+ * @author luckygc
  */
 public abstract class StatelessSessionUtils {
 

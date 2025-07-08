@@ -1,7 +1,7 @@
-package github.gc.jakartadata.provider.hibernate;
+package github.luckygc.jakartadata.provider.hibernate;
 
-import github.gc.jakartadata.ExceptionUtil;
-import github.gc.jakartadata.provider.hibernate.session.StatelessSessionUtils;
+import github.luckygc.jakartadata.ExceptionUtil;
+import github.luckygc.jakartadata.provider.hibernate.session.StatelessSessionUtils;
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.invoke.CallSite;
@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * Jakarta Data Repository 代理类 负责拦截 Repository 方法调用并委托给实际的实现
  *
- * @author gc
+ * @author luckygc
  */
 public class JakartaDataRepositoryProxy<T, I extends T> implements InvocationHandler, Serializable {
 
