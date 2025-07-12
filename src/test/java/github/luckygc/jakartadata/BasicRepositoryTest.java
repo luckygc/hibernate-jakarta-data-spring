@@ -2,7 +2,7 @@ package github.luckygc.jakartadata;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import github.luckygc.jakartadata.annotation.EnableJakartaDataRepositories;
+import github.luckygc.jakartadata.annotation.EnableDataRepositories;
 import github.luckygc.jakartadata.provider.hibernate.SessionFactoryBean;
 
 import org.hibernate.SessionFactory;
@@ -86,7 +86,7 @@ class BasicRepositoryTest {
      * 测试配置类
      */
     @Configuration
-    @EnableJakartaDataRepositories(basePackages = "github.luckygc.jakartadata")
+    @EnableDataRepositories(basePackages = "github.luckygc.jakartadata")
     static class TestConfig {
 
         @Bean

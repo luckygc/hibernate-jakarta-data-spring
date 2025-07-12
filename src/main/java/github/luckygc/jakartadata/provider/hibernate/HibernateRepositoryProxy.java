@@ -1,12 +1,12 @@
 package github.luckygc.jakartadata.provider.hibernate;
 
 import github.luckygc.jakartadata.ExceptionUtil;
-import github.luckygc.jakartadata.provider.hibernate.session.StatelessSessionUtils;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -28,12 +28,12 @@ import javax.sql.DataSource;
  *
  * @author luckygc
  */
-public class JakartaDataRepositoryProxy<T, I extends T> implements InvocationHandler, Serializable {
+public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandler, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = LoggerFactory.getLogger(JakartaDataRepositoryProxy.class);
+    private static final Logger log = LoggerFactory.getLogger(HibernateRepositoryProxy.class);
 
     private static final ThreadLocal<StatelessSession> threadLocalSession = new ThreadLocal<>();
 
@@ -41,10 +41,9 @@ public class JakartaDataRepositoryProxy<T, I extends T> implements InvocationHan
     private final SessionFactory sessionFactory;
     private final DataSource dataSource;
 
-    public JakartaDataRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull SessionFactory sessionFactory,
-        @NonNull DataSource dataSource) {
-        this.sessionFactory = sessionFactory;
-        this.dataSource = dataSource;
+    public HibernateRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull BeanFactory beanFactory ) {
+        this.sessionFactory = beanFactory.getBean(SessionFactory.class);
+        this.dataSource = beanFactory.getBean(DataSource.class);
 
         var implementationClass = getImplementationClass(repositoryInterface);
         this.constructorInvoker = createConstructorInvoker(implementationClass);

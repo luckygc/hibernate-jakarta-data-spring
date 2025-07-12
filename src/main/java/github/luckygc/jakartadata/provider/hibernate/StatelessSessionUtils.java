@@ -1,4 +1,4 @@
-package github.luckygc.jakartadata.provider.hibernate.session;
+package github.luckygc.jakartadata.provider.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;

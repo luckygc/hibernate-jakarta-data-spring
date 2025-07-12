@@ -1,5 +1,6 @@
 package github.luckygc.jakartadata.annotation;
 
+import github.luckygc.jakartadata.DataRepositoryRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -12,8 +13,8 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(JakartaDataRepositoryRegistrar.class)
-public @interface EnableJakartaDataRepositories {
+@Import(DataRepositoryRegistrar.class)
+public @interface EnableDataRepositories {
 
     /** 要扫描的基础包路径 */
     String[] basePackages() default {};
