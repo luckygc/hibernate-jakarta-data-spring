@@ -32,6 +32,7 @@ public class DataRepositoryFactoryBean<T> extends AbstractFactoryBean<T> {
 
     /**
      * 构造函数
+     *
      * @param repositoryInterface Repository接口类型
      */
     public DataRepositoryFactoryBean(Class<T> repositoryInterface) {
@@ -40,6 +41,7 @@ public class DataRepositoryFactoryBean<T> extends AbstractFactoryBean<T> {
 
     /**
      * 设置Repository provider
+     *
      * @param provider provider名称，目前支持"hibernate"或null(默认使用hibernate)
      */
     public void setProvider(String provider) {
