@@ -125,7 +125,6 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
                 MethodType.methodType(implementationClass, StatelessSession.class) // 实际方法类型
             );
 
-            @SuppressWarnings("unchecked")
             Function<StatelessSession, I> invoker = (Function<StatelessSession, I>) callSite.getTarget()
                 .invokeExact();
 
