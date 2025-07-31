@@ -1,6 +1,9 @@
 package github.luckygc.jakartadata;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import github.luckygc.jakartadata.annotation.EnableDataRepositories;
 import github.luckygc.jakartadata.provider.hibernate.SessionFactoryBean;
@@ -23,7 +26,7 @@ import javax.sql.DataSource;
 /**
  * 事务管理测试
  * 测试事务性和非事务性操作
- * 
+ *
  * @author luckygc
  */
 @SpringJUnitConfig(classes = TransactionTest.TestConfig.class)
@@ -137,7 +140,7 @@ class TransactionTest {
         }
 
         @Bean
-        public PlatformTransactionManager transactionManager(DataSource dataSource){
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
             return new DataSourceTransactionManager(dataSource);
         }
 
