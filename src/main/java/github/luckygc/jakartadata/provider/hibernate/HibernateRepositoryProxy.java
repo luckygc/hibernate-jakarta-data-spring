@@ -66,7 +66,7 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
      * @param repositoryInterface Repository接口类型
      * @param beanFactory Spring Bean工厂，用于获取SessionFactory和DataSource
      */
-    public HibernateRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull BeanFactory beanFactory ) {
+    public HibernateRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull BeanFactory beanFactory) {
         this.sessionFactory = beanFactory.getBean(SessionFactory.class);
         this.dataSource = beanFactory.getBean(DataSource.class);
 
@@ -90,8 +90,8 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
             return (Class<I>) Class.forName(implementationClassName);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(
-                String.format("无法找到Repository接口 '%s' 的Hibernate生成实现类 '%s_'。" +
-                    "请确保已正确配置Hibernate注解处理器并重新编译项目。",
+                String.format("无法找到Repository接口 '%s' 的Hibernate生成实现类 '%s_'。"
+                    + "请确保已正确配置Hibernate注解处理器并重新编译项目。",
                     repositoryInterface.getName(), repositoryInterface.getName()), e);
         }
     }
@@ -133,8 +133,8 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
 
         } catch (Throwable e) {
             throw new IllegalStateException(
-                String.format("无法为实现类 '%s' 创建构造函数调用器。" +
-                    "这通常表示实现类缺少期望的构造函数 (StatelessSession session)。",
+                String.format("无法为实现类 '%s' 创建构造函数调用器。"
+                    + "这通常表示实现类缺少期望的构造函数 (StatelessSession session)。",
                     implementationClass.getName()), e);
         }
     }
