@@ -1,6 +1,9 @@
 package github.luckygc.jakartadata;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import github.luckygc.jakartadata.annotation.EnableDataRepositories;
 import github.luckygc.jakartadata.provider.hibernate.SessionFactoryBean;
@@ -24,7 +27,7 @@ import javax.sql.DataSource;
 /**
  * 基本Repository测试
  * 只测试基本的CRUD操作
- * 
+ *
  * @author luckygc
  */
 @SpringJUnitConfig(classes = BasicRepositoryTest.TestConfig.class)
@@ -98,7 +101,7 @@ class BasicRepositoryTest {
         }
 
         @Bean
-        public PlatformTransactionManager transactionManager(DataSource dataSource){
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
             return new DataSourceTransactionManager(dataSource);
         }
 
