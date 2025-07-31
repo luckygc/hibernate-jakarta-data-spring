@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 package github.luckygc.jakartadata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,8 +42,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 /**
- * 基本Repository测试
- * 只测试基本的CRUD操作
+ * 基本Repository测试 只测试基本的CRUD操作
  *
  * @author luckygc
  */
@@ -41,28 +57,28 @@ class BasicRepositoryTest {
     void testBasicCrudOperations() {
         // 验证Repository已正确注入
         assertNotNull(basicRepository);
-        
+
         // 创建测试实体
         User entity = new User();
         entity.setName("测试实体");
         entity.setEmail("这是一个测试实体");
-        
+
         // 保存实体
         User saved = basicRepository.save(entity);
         assertNotNull(saved.getId());
         assertEquals("测试实体", saved.getName());
         assertEquals("这是一个测试实体", saved.getEmail());
-        
+
         // 查找实体
         Optional<User> found = basicRepository.findById(saved.getId());
         assertTrue(found.isPresent());
         assertEquals(saved.getName(), found.get().getName());
-        
+
         // 更新实体
         saved.setEmail("更新后的描述");
         User updated = basicRepository.save(saved);
         assertEquals("更新后的描述", updated.getEmail());
-        
+
         // 删除实体
         basicRepository.delete(saved);
         assertFalse(basicRepository.findById(saved.getId()).isPresent());
@@ -74,11 +90,11 @@ class BasicRepositoryTest {
         User entity = new User();
         entity.setName("保存测试");
         entity.setEmail("用于测试保存和查找");
-        
+
         // 保存实体
         User saved = basicRepository.save(entity);
         assertNotNull(saved.getId());
-        
+
         // 查找实体
         Optional<User> found = basicRepository.findById(saved.getId());
         assertTrue(found.isPresent());
@@ -94,9 +110,7 @@ class BasicRepositoryTest {
 
         @Bean
         public DataSource dataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .addScript("classpath:schema.sql")
+            return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:schema.sql")
                     .build();
         }
 
@@ -109,9 +123,9 @@ class BasicRepositoryTest {
         public SessionFactory sessionFactory(DataSource dataSource) {
             SessionFactoryBean sessionFactoryBean = new SessionFactoryBean();
             sessionFactoryBean.setDataSource(dataSource);
-            sessionFactoryBean.setPackagesToScan(new String[]{"github.luckygc.jakartadata"});
+            sessionFactoryBean.setPackagesToScan(new String[] {"github.luckygc.jakartadata"});
             return sessionFactoryBean.getObject();
         }
     }
 
-} 
+}

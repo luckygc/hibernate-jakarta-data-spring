@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 package github.luckygc.jakartadata;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,8 +40,7 @@ import jakarta.data.exceptions.OptimisticLockingFailureException;
 import javax.sql.DataSource;
 
 /**
- * 异常处理测试
- * 测试各种异常情况的处理
+ * 异常处理测试 测试各种异常情况的处理
  *
  * @author luckygc
  */
@@ -64,7 +80,7 @@ class ExceptionHandlingTest {
         nonExistentUser.setId(999L);
         nonExistentUser.setName("不存在的用户");
         nonExistentUser.setEmail("nonexistent@example.com");
-        
+
         assertThrows(OptimisticLockingFailureException.class, () -> {
             basicRepository.delete(nonExistentUser);
         });
@@ -76,15 +92,15 @@ class ExceptionHandlingTest {
         User user1 = new User();
         user1.setName("用户1");
         user1.setEmail("duplicate@example.com");
-        
+
         User user2 = new User();
         user2.setName("用户2");
         user2.setEmail("duplicate@example.com");
-        
+
         // 保存第一个用户应该成功
         User saved1 = basicRepository.save(user1);
         assertNotNull(saved1.getId());
-        
+
         // 保存第二个用户应该失败（邮箱重复）
         assertThrows(Exception.class, () -> {
             basicRepository.save(user2);
@@ -100,9 +116,7 @@ class ExceptionHandlingTest {
 
         @Bean
         public DataSource dataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .addScript("classpath:schema.sql")
+            return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:schema.sql")
                     .build();
         }
 
@@ -115,7 +129,7 @@ class ExceptionHandlingTest {
         public SessionFactory sessionFactory(DataSource dataSource) {
             SessionFactoryBean sessionFactoryBean = new SessionFactoryBean();
             sessionFactoryBean.setDataSource(dataSource);
-            sessionFactoryBean.setPackagesToScan(new String[]{"github.luckygc.jakartadata"});
+            sessionFactoryBean.setPackagesToScan(new String[] {"github.luckygc.jakartadata"});
             return sessionFactoryBean.getObject();
         }
     }

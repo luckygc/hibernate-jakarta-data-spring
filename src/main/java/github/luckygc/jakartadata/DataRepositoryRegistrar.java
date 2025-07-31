@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 package github.luckygc.jakartadata;
 
 import github.luckygc.jakartadata.annotation.EnableDataRepositories;
@@ -38,20 +55,16 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
 
     private static final String RESOURCE_PATTERN = "/**/*.class";
 
-    private final ResourcePatternResolver resourcePatternResolver =
-            new PathMatchingResourcePatternResolver();
+    private final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     private List<String> basePackages;
 
     @Override
-    public void registerBeanDefinitions(
-            @NonNull AnnotationMetadata importingClassMetadata,
+    public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata,
             @NonNull BeanDefinitionRegistry registry) {
 
-        AnnotationAttributes attributes =
-                AnnotationAttributes.fromMap(
-                        importingClassMetadata.getAnnotationAttributes(
-                                EnableDataRepositories.class.getName()));
+        AnnotationAttributes attributes = AnnotationAttributes
+                .fromMap(importingClassMetadata.getAnnotationAttributes(EnableDataRepositories.class.getName()));
 
         if (attributes == null) {
             log.warn("未找到 @EnableDataRepositories 注解，跳过Repository扫描");
@@ -69,20 +82,17 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
         try {
             scanAndRegisterRepositories(registry);
         } catch (Exception e) {
-            throw new IllegalStateException(
-                String.format("扫描和注册Jakarta Data Repository失败，包路径: %s", basePackages), e);
+            throw new IllegalStateException(String.format("扫描和注册Jakarta Data Repository失败，包路径: %s", basePackages), e);
         }
 
         log.info("已完成Jakarta Data Repository扫描注册，包路径: {}", basePackages);
     }
 
     /** 获取要扫描的基础包路径 */
-    private List<String> getBasePackages(
-            AnnotationMetadata importingClassMetadata, AnnotationAttributes attributes) {
+    private List<String> getBasePackages(AnnotationMetadata importingClassMetadata, AnnotationAttributes attributes) {
 
         // 从 basePackages 属性获取
-        List<String> basePackages =
-                new ArrayList<>(Arrays.asList(attributes.getStringArray("basePackages")));
+        List<String> basePackages = new ArrayList<>(Arrays.asList(attributes.getStringArray("basePackages")));
 
         // 如果没有指定包路径，使用注解所在类的包路径
         if (basePackages.isEmpty()) {
@@ -97,14 +107,11 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
 
     /** 扫描并注册 Repository 接口 */
     private void scanAndRegisterRepositories(BeanDefinitionRegistry registry) throws Exception {
-        MetadataReaderFactory readerFactory =
-                new CachingMetadataReaderFactory(resourcePatternResolver);
+        MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
         for (String basePackage : basePackages) {
-            String pattern =
-                    ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-                            + ClassUtils.convertClassNameToResourcePath(basePackage)
-                            + RESOURCE_PATTERN;
+            String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                    + ClassUtils.convertClassNameToResourcePath(basePackage) + RESOURCE_PATTERN;
 
             Resource[] resources = resourcePatternResolver.getResources(pattern);
 
@@ -113,8 +120,7 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
                     try {
                         MetadataReader reader = readerFactory.getMetadataReader(resource);
                         if (isRepositoryInterface(reader)) {
-                            registerRepositoryBean(
-                                    registry, reader.getClassMetadata().getClassName());
+                            registerRepositoryBean(registry, reader.getClassMetadata().getClassName());
                         }
                     } catch (Exception e) {
                         log.warn("Failed to read resource: {}", resource, e);
@@ -136,9 +142,7 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
             return reader.getAnnotationMetadata().hasAnnotation(Repository.class.getName());
 
         } catch (Exception e) {
-            log.debug(
-                    "Failed to check if class is repository interface: {}",
-                    reader.getClassMetadata().getClassName(),
+            log.debug("Failed to check if class is repository interface: {}", reader.getClassMetadata().getClassName(),
                     e);
             return false;
         }
@@ -152,10 +156,8 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
             // 获取Repository注解的provider属性值
             String provider = getRepositoryProvider(repositoryInterface);
 
-            BeanDefinitionBuilder builder =
-                    BeanDefinitionBuilder.genericBeanDefinition(DataRepositoryFactoryBean.class)
-                            .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
-                            .addConstructorArgValue(repositoryInterface);
+            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(DataRepositoryFactoryBean.class)
+                    .setRole(BeanDefinition.ROLE_INFRASTRUCTURE).addConstructorArgValue(repositoryInterface);
 
             // 如果provider不为空，添加到bean definition中
             if (StringUtils.hasText(provider)) {
@@ -171,11 +173,7 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
 
             registry.registerBeanDefinition(beanName, beanDefinition);
 
-            log.debug(
-                    "Registered Repository bean: {} -> {} with provider: {}",
-                    beanName,
-                    className,
-                    provider);
+            log.debug("Registered Repository bean: {} -> {} with provider: {}", beanName, className, provider);
 
         } catch (Exception e) {
             log.error("Failed to register Repository bean for class: {}", className, e);
@@ -190,9 +188,7 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
                 return repositoryAnnotation.provider();
             }
         } catch (Exception e) {
-            log.debug(
-                    "Failed to get provider from Repository annotation for class: {}",
-                    repositoryInterface.getName(),
+            log.debug("Failed to get provider from Repository annotation for class: {}", repositoryInterface.getName(),
                     e);
         }
         return "";

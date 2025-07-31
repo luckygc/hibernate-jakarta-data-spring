@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 package github.luckygc.jakartadata.provider.hibernate;
 
 import jakarta.persistence.Converter;
@@ -28,32 +45,29 @@ public class HibernateScanner {
     private static final String RESOURCE_PATTERN = "/**/*.class";
 
     /** 实体类型过滤器数组 包含Entity和MappedSuperclass注解的过滤器，用于识别JPA实体类和映射超类 */
-    private static final TypeFilter[] ENTITY_TYPE_FILTERS =
-            new TypeFilter[] {
-                new AnnotationTypeFilter(Entity.class, false),
-                new AnnotationTypeFilter(MappedSuperclass.class, false)
-            };
+    private static final TypeFilter[] ENTITY_TYPE_FILTERS = new TypeFilter[] {
+            new AnnotationTypeFilter(Entity.class, false), new AnnotationTypeFilter(MappedSuperclass.class, false)};
 
     /** 转换器类型过滤器 用于识别标注了@Converter注解的属性转换器类 */
-    private static final TypeFilter CONVERTER_TYPE_FILTER =
-            new AnnotationTypeFilter(Converter.class, false);
+    private static final TypeFilter CONVERTER_TYPE_FILTER = new AnnotationTypeFilter(Converter.class, false);
 
     /** 资源模式解析器 用于解析类路径下的资源文件 */
-    private static final ResourcePatternResolver resourcePatternResolver =
-            new PathMatchingResourcePatternResolver();
+    private static final ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     /**
      * 扫描指定包路径下的实体类并添加到Hibernate配置中
      *
-     * <p>该方法会扫描指定包路径下的所有类文件，识别标注了@Entity、@MappedSuperclass或@Converter注解的类，
-     * 并将这些类添加到Hibernate持久化配置中作为管理类。
+     * <p>
+     * 该方法会扫描指定包路径下的所有类文件，识别标注了@Entity、@MappedSuperclass或@Converter注解的类， 并将这些类添加到Hibernate持久化配置中作为管理类。
      *
-     * @param configuration Hibernate持久化配置对象
-     * @param packagesToScan 要扫描的包路径数组，支持多个包路径
-     * @throws HibernateException 当扫描过程中发生错误时抛出
+     * @param configuration
+     *            Hibernate持久化配置对象
+     * @param packagesToScan
+     *            要扫描的包路径数组，支持多个包路径
+     * @throws HibernateException
+     *             当扫描过程中发生错误时抛出
      */
-    public static void scan(
-            HibernatePersistenceConfiguration configuration, String... packagesToScan)
+    public static void scan(HibernatePersistenceConfiguration configuration, String... packagesToScan)
             throws HibernateException {
         // 使用TreeSet保证类名的有序性，便于调试和日志输出
         Set<String> managedClassNames = new TreeSet<>();
@@ -61,15 +75,12 @@ public class HibernateScanner {
             // 遍历每个要扫描的包路径
             for (String pkg : packagesToScan) {
                 // 构建类路径资源匹配模式
-                String pattern =
-                        ResourcePatternResolver.CLASSPATH_URL_PREFIX
-                                + ClassUtils.convertClassNameToResourcePath(pkg)
-                                + RESOURCE_PATTERN;
+                String pattern = ResourcePatternResolver.CLASSPATH_URL_PREFIX
+                        + ClassUtils.convertClassNameToResourcePath(pkg) + RESOURCE_PATTERN;
                 // 获取匹配模式的所有资源文件
                 Resource[] resources = resourcePatternResolver.getResources(pattern);
                 // 创建元数据读取器工厂，用于读取类的元数据信息
-                MetadataReaderFactory readerFactory =
-                        new CachingMetadataReaderFactory(resourcePatternResolver);
+                MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
                 // 遍历每个资源文件
                 for (Resource resource : resources) {
@@ -110,15 +121,19 @@ public class HibernateScanner {
     /**
      * 检查类是否匹配实体类型过滤器
      *
-     * <p>该方法检查给定的类是否标注了@Entity或@MappedSuperclass注解。
+     * <p>
+     * 该方法检查给定的类是否标注了@Entity或@MappedSuperclass注解。
      *
-     * @param reader 类的元数据读取器
-     * @param readerFactory 元数据读取器工厂
+     * @param reader
+     *            类的元数据读取器
+     * @param readerFactory
+     *            元数据读取器工厂
      * @return 如果类匹配任一实体类型过滤器则返回true，否则返回false
-     * @throws IOException 当读取类元数据时发生IO异常
+     * @throws IOException
+     *             当读取类元数据时发生IO异常
      */
-    private static boolean matchesEntityTypeFilter(
-            MetadataReader reader, MetadataReaderFactory readerFactory) throws IOException {
+    private static boolean matchesEntityTypeFilter(MetadataReader reader, MetadataReaderFactory readerFactory)
+            throws IOException {
         // 遍历所有实体类型过滤器
         for (TypeFilter filter : ENTITY_TYPE_FILTERS) {
             if (filter.match(reader, readerFactory)) {

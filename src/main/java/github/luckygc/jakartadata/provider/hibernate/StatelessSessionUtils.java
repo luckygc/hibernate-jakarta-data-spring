@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 package github.luckygc.jakartadata.provider.hibernate;
 
 import org.hibernate.SessionFactory;
@@ -25,7 +42,8 @@ public abstract class StatelessSessionUtils {
     /**
      * 安全关闭StatelessSession
      *
-     * @param session StatelessSession实例
+     * @param session
+     *            StatelessSession实例
      */
     public static void closeSession(@Nullable StatelessSession session) {
         if (session != null) {
@@ -43,21 +61,25 @@ public abstract class StatelessSessionUtils {
     /**
      * 获取事务性的StatelessSession
      *
-     * <p>在事务环境中，Session会被绑定到当前事务，并在事务结束时自动清理。
+     * <p>
+     * 在事务环境中，Session会被绑定到当前事务，并在事务结束时自动清理。
      *
-     * @param sessionFactory Hibernate SessionFactory
-     * @param dataSource 数据源
+     * @param sessionFactory
+     *            Hibernate SessionFactory
+     * @param dataSource
+     *            数据源
      * @return 事务性StatelessSession
-     * @throws RuntimeException 如果创建Session失败
+     * @throws RuntimeException
+     *             如果创建Session失败
      */
     @NonNull
     public static StatelessSession getTransactionalSession(@NonNull SessionFactory sessionFactory,
-        @NonNull DataSource dataSource) {
+            @NonNull DataSource dataSource) {
         String resourceKey = generateResourceKey(sessionFactory, dataSource);
 
         // 检查是否已经存在绑定的Session
-        StatelessSessionHolder holder = (StatelessSessionHolder)
-            TransactionSynchronizationManager.getResource(resourceKey);
+        StatelessSessionHolder holder = (StatelessSessionHolder) TransactionSynchronizationManager
+                .getResource(resourceKey);
 
         if (holder != null && holder.getStatelessSession().isConnected()) {
             log.debug("复用现有的事务性StatelessSession");
@@ -78,8 +100,8 @@ public abstract class StatelessSessionUtils {
             TransactionSynchronizationManager.bindResource(resourceKey, holder);
 
             // 注册事务同步回调
-            TransactionSynchronizationManager.registerSynchronization(
-                new StatelessSessionResourceSynchronization(holder, resourceKey));
+            TransactionSynchronizationManager
+                    .registerSynchronization(new StatelessSessionResourceSynchronization(holder, resourceKey));
 
             log.debug("创建并绑定新的事务性StatelessSession");
             return session;
@@ -98,8 +120,7 @@ public abstract class StatelessSessionUtils {
      * 生成资源键
      */
     @NonNull
-    private static String generateResourceKey(@NonNull SessionFactory sessionFactory,
-        @NonNull DataSource dataSource) {
+    private static String generateResourceKey(@NonNull SessionFactory sessionFactory, @NonNull DataSource dataSource) {
         return sessionFactory + "_" + dataSource;
     }
 
@@ -107,10 +128,9 @@ public abstract class StatelessSessionUtils {
      * StatelessSession 资源同步器 用于在事务结束时清理 Session 资源
      */
     public static class StatelessSessionResourceSynchronization
-        extends ResourceHolderSynchronization<StatelessSessionHolder, String> {
+            extends ResourceHolderSynchronization<StatelessSessionHolder, String> {
 
-        public StatelessSessionResourceSynchronization(StatelessSessionHolder resourceHolder,
-            String resourceKey) {
+        public StatelessSessionResourceSynchronization(StatelessSessionHolder resourceHolder, String resourceKey) {
             super(resourceHolder, resourceKey);
         }
 
