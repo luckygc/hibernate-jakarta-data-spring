@@ -1,6 +1,9 @@
 package github.luckygc.jakartadata;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import github.luckygc.jakartadata.annotation.EnableDataRepositories;
 import github.luckygc.jakartadata.provider.hibernate.SessionFactoryBean;
@@ -22,7 +25,7 @@ import javax.sql.DataSource;
 /**
  * 异常处理测试
  * 测试各种异常情况的处理
- * 
+ *
  * @author luckygc
  */
 @SpringJUnitConfig(classes = ExceptionHandlingTest.TestConfig.class)
@@ -104,7 +107,7 @@ class ExceptionHandlingTest {
         }
 
         @Bean
-        public PlatformTransactionManager transactionManager(DataSource dataSource){
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
             return new DataSourceTransactionManager(dataSource);
         }
 
