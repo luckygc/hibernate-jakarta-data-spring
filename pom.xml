@@ -5,10 +5,10 @@
 
     <groupId>com.github.luckygc</groupId>
     <artifactId>jakarta-data-spring</artifactId>
-    <version>1.1.3</version>
+    <version>1.1.4</version>
 
     <packaging>jar</packaging>
-    <name>hibernate-data-repositories-spring</name>
+    <name>jakarta-data-spring</name>
     <description>适配spring和hibernate data repositories</description>
 
     <properties>
@@ -28,6 +28,12 @@
             <artifactId>jakarta.data-api</artifactId>
             <version>${jakarta.data.version}</version>
         </dependency>
+
+        <dependency>
+			<groupId>org.jspecify</groupId>
+			<artifactId>jspecify</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
         <dependency>
             <groupId>org.hibernate.orm</groupId>
