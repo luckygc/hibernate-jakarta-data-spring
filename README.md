@@ -3,7 +3,7 @@
 **数据访问层解决方案** - Hibernate Data Repository 与 Spring 框架的集成
 
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://openjdk.java.net/)
-[![Hibernate](https://img.shields.io/badge/Hibernate-7.0.5.Final-green.svg)](https://hibernate.org/)
+[![Hibernate](https://img.shields.io/badge/Hibernate-7.0.6.Final-green.svg)](https://hibernate.org/)
 [![Spring](https://img.shields.io/badge/Spring-6.x-brightgreen.svg)](https://spring.io/)
 [![Jakarta Data](https://img.shields.io/badge/Jakarta%20Data-1.0.1-blue.svg)](https://jakarta.ee/specifications/data/)
 
@@ -31,8 +31,8 @@
 <dependencies>
 <dependency>
     <groupId>com.github.luckygc</groupId>
-    <artifactId>hibernate-jakarta-data-spring</artifactId>
-    <version>1.0.0</version>
+    <artifactId>jakarta-data-spring</artifactId>
+    <version>1.1.3</version>
 </dependency>
 </dependencies>
 
@@ -73,7 +73,7 @@
 ```java
 
 @Configuration
-@EnableJakartaDataRepositories(basePackages = "com.example.repository")
+@EnableDataRepositories(basePackages = "com.example.repository")
 public class HibernateDataConfiguration {
 
     @Bean
