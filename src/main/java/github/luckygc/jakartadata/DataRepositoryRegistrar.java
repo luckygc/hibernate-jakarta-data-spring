@@ -54,7 +54,7 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
                                 EnableDataRepositories.class.getName()));
 
         if (attributes == null) {
-            log.warn("No @EnableJakartaDataRepositories annotation found");
+            log.warn("未找到 @EnableDataRepositories 注解，跳过Repository扫描");
             return;
         }
 
@@ -62,17 +62,18 @@ public class DataRepositoryRegistrar implements ImportBeanDefinitionRegistrar {
         basePackages = getBasePackages(importingClassMetadata, attributes);
 
         if (basePackages.isEmpty()) {
-            log.warn("No base packages specified for Jakarta Data Repository scanning");
+            log.warn("未指定要扫描的基础包路径，跳过Jakarta Data Repository扫描");
             return;
         }
 
         try {
             scanAndRegisterRepositories(registry);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(
+                String.format("扫描和注册Jakarta Data Repository失败，包路径: %s", basePackages), e);
         }
 
-        log.info("Registered Jakarta Data Repository scanner for packages: {}", basePackages);
+        log.info("已完成Jakarta Data Repository扫描注册，包路径: {}", basePackages);
     }
 
     /** 获取要扫描的基础包路径 */

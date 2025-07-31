@@ -24,8 +24,21 @@ import java.util.function.Function;
 import javax.sql.DataSource;
 
 /**
- * Jakarta Data Repository 代理类 负责拦截 Repository 方法调用并委托给实际的实现
+ * Jakarta Data Repository 代理类
  *
+ * <p>负责拦截Repository方法调用并委托给Hibernate生成的实际实现类。
+ * 该代理类管理StatelessSession的生命周期，支持事务性和非事务性操作。
+ *
+ * <p>主要功能：
+ * <ul>
+ *   <li>动态创建Hibernate生成的Repository实现类实例</li>
+ *   <li>管理StatelessSession的创建、绑定和释放</li>
+ *   <li>支持Spring事务管理</li>
+ *   <li>提供线程安全的Session访问</li>
+ * </ul>
+ *
+ * @param <T> Repository接口类型
+ * @param <I> Hibernate生成的实现类类型
  * @author luckygc
  */
 public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandler, Serializable {
@@ -35,12 +48,24 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
 
     private static final Logger log = LoggerFactory.getLogger(HibernateRepositoryProxy.class);
 
+    /** 线程本地Session存储，用于非事务性操作 */
     private static final ThreadLocal<StatelessSession> threadLocalSession = new ThreadLocal<>();
 
+    /** 构造函数调用器，用于创建Repository实现类实例 */
     private final Function<StatelessSession, I> constructorInvoker;
+
+    /** Hibernate SessionFactory */
     private final SessionFactory sessionFactory;
+
+    /** 数据源 */
     private final DataSource dataSource;
 
+    /**
+     * 构造函数
+     *
+     * @param repositoryInterface Repository接口类型
+     * @param beanFactory Spring Bean工厂，用于获取SessionFactory和DataSource
+     */
     public HibernateRepositoryProxy(@NonNull Class<T> repositoryInterface, @NonNull BeanFactory beanFactory ) {
         this.sessionFactory = beanFactory.getBean(SessionFactory.class);
         this.dataSource = beanFactory.getBean(DataSource.class);
@@ -50,7 +75,13 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
     }
 
     /**
-     * 获取 Hibernate 生成的实现类
+     * 获取Hibernate生成的实现类
+     *
+     * <p>Hibernate会为每个Repository接口生成一个以"_"结尾的实现类。
+     *
+     * @param repositoryInterface Repository接口类型
+     * @return Hibernate生成的实现类
+     * @throws IllegalStateException 如果找不到实现类
      */
     @SuppressWarnings("unchecked")
     private Class<I> getImplementationClass(Class<T> repositoryInterface) {
@@ -58,13 +89,22 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
             String implementationClassName = repositoryInterface.getName() + "_";
             return (Class<I>) Class.forName(implementationClassName);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Cannot find implementation class for repository: " +
-                repositoryInterface.getName(), e);
+            throw new IllegalStateException(
+                String.format("无法找到Repository接口 '%s' 的Hibernate生成实现类 '%s_'。" +
+                    "请确保已正确配置Hibernate注解处理器并重新编译项目。",
+                    repositoryInterface.getName(), repositoryInterface.getName()), e);
         }
     }
 
     /**
-     * 使用 LambdaMetafactory 创建构造函数调用器
+     * 使用LambdaMetafactory创建构造函数调用器
+     *
+     * <p>通过方法句柄和Lambda表达式创建高性能的构造函数调用器，
+     * 避免反射调用的性能开销。
+     *
+     * @param implementationClass Hibernate生成的实现类
+     * @return 构造函数调用器
+     * @throws IllegalStateException 如果无法创建调用器
      */
     private Function<StatelessSession, I> createConstructorInvoker(Class<I> implementationClass) {
         try {
@@ -92,40 +132,52 @@ public class HibernateRepositoryProxy<T, I extends T> implements InvocationHandl
             return invoker;
 
         } catch (Throwable e) {
-            throw new RuntimeException("Cannot create constructor invoker for class: " +
-                implementationClass.getName(), e);
+            throw new IllegalStateException(
+                String.format("无法为实现类 '%s' 创建构造函数调用器。" +
+                    "这通常表示实现类缺少期望的构造函数 (StatelessSession session)。",
+                    implementationClass.getName()), e);
         }
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 处理Object类的方法，避免不必要的Session创建
+        if (Object.class.equals(method.getDeclaringClass())) {
+            return method.invoke(this, args);
+        }
+
         StatelessSession session = null;
         boolean isSynchronizationActive = TransactionSynchronizationManager.isSynchronizationActive();
+        boolean sessionCreatedHere = false;
 
         try {
-            // 处理 Object 类的方法
-            if (Object.class.equals(method.getDeclaringClass())) {
-                return method.invoke(this, args);
-            }
-
+            // 获取或创建Session
             if (isSynchronizationActive) {
+                // 事务性操作：使用事务绑定的Session
                 session = StatelessSessionUtils.getTransactionalSession(sessionFactory, dataSource);
-            } else if (threadLocalSession.get() != null) {
-                session = threadLocalSession.get();
             } else {
-                session = sessionFactory.openStatelessSession();
-                threadLocalSession.set(session);
+                // 非事务性操作：使用线程本地Session
+                session = threadLocalSession.get();
+                if (session == null || !session.isConnected()) {
+                    session = sessionFactory.openStatelessSession();
+                    threadLocalSession.set(session);
+                    sessionCreatedHere = true;
+                    log.debug("创建新的非事务性StatelessSession");
+                }
             }
 
+            // 创建Repository实现实例并调用方法
             Object repositoryImpl = constructorInvoker.apply(session);
-
             return method.invoke(repositoryImpl, args);
+
         } catch (Throwable t) {
             throw ExceptionUtil.unwrapThrowable(t);
         } finally {
-            if (session != null && !isSynchronizationActive) {
+            // 清理非事务性Session
+            if (!isSynchronizationActive && sessionCreatedHere) {
                 StatelessSessionUtils.closeSession(session);
                 threadLocalSession.remove();
+                log.debug("清理非事务性StatelessSession");
             }
         }
     }
